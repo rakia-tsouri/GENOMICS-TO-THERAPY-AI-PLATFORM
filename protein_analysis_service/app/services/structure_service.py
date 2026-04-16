@@ -89,7 +89,7 @@ def save_and_create_structure(gene_id: str, pdb_content: str, source: str, unipr
         with open(file_path, "w") as f:
             f.write(pdb_content)
         
-        plddt_info = extract_plddt_from_pdb(pdb_content)
+        plddt_info = extract_plddt_from_pdb(pdb_content, source=source)
         
         return Structure3D(
             source=source,

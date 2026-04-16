@@ -36,7 +36,7 @@ def parse_blast_xml(xml_data: str) -> List[Dict[str, Any]]:
             })
     return hits
 
-def extract_plddt_from_pdb(pdb_content: str) -> Dict[str, Any]:
+def extract_plddt_from_pdb(pdb_content: str, source: str = "AlphaFold DB") -> Dict[str, Any]:
     """
     Extract pLDDT scores from a PDB string.
     In AlphaFold/ESMFold PDBs, the B-factor field (columns 61-66) 
@@ -50,30 +50,31 @@ def extract_plddt_from_pdb(pdb_content: str) -> Dict[str, Any]:
     for model in structure:
         for chain in model:
             for residue in chain:
-                # Get the B-factor of the first atom (usually CA is used, but all atoms have it)
-                # We'll take the average of all atoms in the residue or just one.
-                # Standard practice for AF2 is that all atoms in a residue have the same pLDDT.
                 atoms = list(residue.get_atoms())
                 if atoms:
-                    plddt_scores.append(atoms[0].get_bfactor())
+                    score = atoms[0].get_bfactor()
+                    # ESMFold returns 0-1, AlphaFold returns 0-100
+                    if source == "ESMFold" and score <= 1.0:
+                        score = score * 100
+                    plddt_scores.append(score)
     
     if not plddt_scores:
         return {"mean": 0, "per_residue": []}
         
     mean_plddt = sum(plddt_scores) / len(plddt_scores)
     
-    confidence = "low"
-    if mean_plddt > 90:
+    # Standard confidence thresholds
+    if mean_plddt >= 90:
         confidence = "very high"
-    elif mean_plddt > 70:
+    elif mean_plddt >= 70:
         confidence = "confident"
-    elif mean_plddt > 50:
+    elif mean_plddt >= 50:
         confidence = "low"
     else:
         confidence = "very low"
         
     return {
-        "mean": round(mean_plddt, 2),
-        "per_residue": [round(s, 2) for s in plddt_scores],
+        "mean": round(mean_plddt, 1),
+        "per_residue": [round(s, 1) for s in plddt_scores],
         "confidence": confidence
     }
