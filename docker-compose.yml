@@ -1,0 +1,50 @@
+services:
+  genomics-validation:
+    build:
+      context: .
+      dockerfile: genomics_validation/Dockerfile
+    container_name: genomics-validation
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - bio-network
+
+  protein-analysis-service:
+    build:
+      context: .
+      dockerfile: protein_analysis_service/Dockerfile
+    container_name: protein-analysis-service
+    ports:
+      - "8001:8001"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - USE_BLAST=true
+      - DATA_PATH=/data/structures
+    volumes:
+      - bio-data:/data/structures
+    depends_on:
+      - redis
+    networks:
+      - bio-network
+
+  redis:
+    image: "redis:alpine"
+    container_name: bio-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - bio-network
+
+networks:
+  bio-network:
+    driver: bridge
+
+volumes:
+  bio-data:
+    driver: local
