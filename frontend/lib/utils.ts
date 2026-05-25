@@ -44,14 +44,15 @@ export function formatPercent(
   value: number | null | undefined,
   digits = 1
 ): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  // Guard against non-numeric input (e.g. a stray string) so we never crash.
+  if (typeof value !== "number" || Number.isNaN(value)) return "—";
   // Heuristic: values <= 1 are fractions, otherwise already a percentage.
   const pct = value <= 1 ? value * 100 : value;
   return `${pct.toFixed(digits)}%`;
 }
 
 export function toPercentValue(value: number | null | undefined): number {
-  if (value === null || value === undefined || Number.isNaN(value)) return 0;
+  if (typeof value !== "number" || Number.isNaN(value)) return 0;
   const pct = value <= 1 ? value * 100 : value;
   return Math.max(0, Math.min(100, pct));
 }

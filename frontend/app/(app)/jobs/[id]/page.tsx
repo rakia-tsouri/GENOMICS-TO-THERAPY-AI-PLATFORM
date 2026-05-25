@@ -46,6 +46,13 @@ import {
 
 const POLL_INTERVAL = 3000;
 
+/** Render a tri-state mutation signal (true/false/null) as readable text. */
+function signalLabel(signal: boolean | null | undefined): string {
+  if (signal === true) return "Mutated";
+  if (signal === false) return "Wild-type";
+  return "Not assessed";
+}
+
 function KV({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-1.5">
@@ -542,8 +549,8 @@ export default function JobDetailPage() {
                             </Badge>
                           </div>
                           <ConfidenceBar
-                            value={m.confidence ?? m.probability}
-                            label={`p = ${formatPercent(m.probability)}`}
+                            value={m.probability}
+                            label={`p = ${formatPercent(m.probability)} · ${m.confidence ?? ""} confidence`}
                           />
                         </div>
                       ))
@@ -564,12 +571,12 @@ export default function JobDetailPage() {
               icon={<GitCompareArrows className="h-4 w-4" />}
               action={
                 <div className="flex items-center gap-2">
-                  <Badge tone="brand">
-                    Agreement {formatPercent(job.fusion_result.overall_agreement)}
+                  <Badge tone={agreementTone(job.fusion_result.overall_agreement)}>
+                    {job.fusion_result.overall_agreement ?? "—"}
                   </Badge>
                   <Badge tone="slate">
                     κ ={" "}
-                    {job.fusion_result.cohen_kappa != null
+                    {typeof job.fusion_result.cohen_kappa === "number"
                       ? job.fusion_result.cohen_kappa.toFixed(2)
                       : "—"}
                   </Badge>
@@ -594,9 +601,9 @@ export default function JobDetailPage() {
                   job.fusion_result.genes.map((g) => (
                     <TR key={g.gene}>
                       <TD className="font-medium text-slate-900">{g.gene}</TD>
-                      <TD className="text-slate-600">{g.genomic_signal}</TD>
+                      <TD className="text-slate-600">{signalLabel(g.genomic_signal)}</TD>
                       <TD className="text-slate-600">
-                        {g.visual_signal}
+                        {signalLabel(g.visual_signal)}
                         {g.visual_probability != null && (
                           <span className="ml-1 text-xs text-slate-400">
                             ({formatPercent(g.visual_probability)})

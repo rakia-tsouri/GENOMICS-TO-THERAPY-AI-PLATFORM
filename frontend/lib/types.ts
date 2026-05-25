@@ -126,19 +126,19 @@ export interface HistopathologyResult {
 
 export interface FusionGene {
   gene: string;
-  genomic_signal: string;
-  visual_signal: string;
-  visual_probability: number;
+  genomic_signal: boolean | null;
+  visual_signal: boolean | null;
+  visual_probability: number | null;
   agreement: string;
   combined_confidence: number;
   flag_for_review: boolean;
-  note: string;
+  note: string | null;
   [key: string]: unknown;
 }
 
 export interface FusionResult {
-  overall_agreement: number;
-  cohen_kappa: number;
+  overall_agreement: string;
+  cohen_kappa: number | null;
   flagged_genes: string[];
   genes: FusionGene[];
   [key: string]: unknown;
