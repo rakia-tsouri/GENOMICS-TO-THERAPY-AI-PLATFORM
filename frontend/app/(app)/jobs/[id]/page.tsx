@@ -465,6 +465,13 @@ export default function JobDetailPage() {
               icon={<Microscope className="h-4 w-4" />}
             />
             <CardBody className="space-y-4">
+              {/* Track B is integrated end-to-end but its model is not trained yet. */}
+              <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <span className="font-semibold">Demo — model not trained yet.</span>{" "}
+                The Track&nbsp;B histopathology model runs on untrained weights. These
+                mutation predictions illustrate the pipeline only and are{" "}
+                <span className="font-semibold">not scientifically valid</span>.
+              </div>
               {!!job.histopathology_result.warnings?.length && (
                 <InfoBanner>
                   {job.histopathology_result.warnings.map((w, i) => (
