@@ -1,23 +1,58 @@
+# Genomics-to-Therapy AI Platform — full stack
+#
+#   frontend (3000) ──► gateway (8080) ──► genomics-validation   (8000)
+#                                      ├──► protein-analysis      (8001)
+#                                      ├──► drug-discovery        (8002)
+#                                      └──► histopathology        (8003)
+#   gateway ──► postgres (5432)    all services ──► redis (6379)
+#
+# Quick start:  cp .env.example .env  &&  docker compose up --build
+
 services:
+  # ---------------- Infrastructure ----------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: gtt-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-gtt}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gtt}
+      POSTGRES_DB: ${POSTGRES_DB:-gtt}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gtt}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [bio-network]
+
+  redis:
+    image: redis:alpine
+    container_name: gtt-redis
+    ports:
+      - "6379:6379"
+    networks: [bio-network]
+
+  # ---------------- Track A microservices ----------------
   genomics-validation:
     build:
-      context: .
-      dockerfile: genomics_validation/Dockerfile
+      context: ./services/genomics_validation
+      dockerfile: Dockerfile
     container_name: genomics-validation
     ports:
       - "8000:8000"
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    depends_on:
-      - redis
-    networks:
-      - bio-network
+    depends_on: [redis]
+    networks: [bio-network]
 
   protein-analysis-service:
     build:
-      context: .
-      dockerfile: protein_analysis_service/Dockerfile
+      context: ./services/protein_analysis
+      dockerfile: Dockerfile
     container_name: protein-analysis-service
     ports:
       - "8001:8001"
@@ -28,22 +63,12 @@ services:
       - DATA_PATH=/data/structures
     volumes:
       - bio-data:/data/structures
-    depends_on:
-      - redis
-    networks:
-      - bio-network
-
-  redis:
-    image: "redis:alpine"
-    container_name: bio-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - bio-network
+    depends_on: [redis]
+    networks: [bio-network]
 
   drug-discovery-service:
     build:
-      context: ./drug_discovery_service
+      context: ./services/drug_discovery
       dockerfile: Dockerfile
     container_name: drug-discovery-service
     ports:
@@ -56,10 +81,71 @@ services:
       - PDB_VOLUME=/data/structures
     volumes:
       - bio-data:/data/structures
+    depends_on: [redis]
+    networks: [bio-network]
+
+  # ---------------- Track B microservice ----------------
+  histopathology-service:
+    build:
+      context: ./services/histopathology
+      dockerfile: Dockerfile
+    container_name: histopathology-service
+    ports:
+      - "8003:8003"
+    environment:
+      - GRADCAM_VOLUME=/data/structures/gradcam
+    volumes:
+      - bio-data:/data/structures
+    networks: [bio-network]
+
+  # ---------------- Gateway (auth + orchestration + fusion) ----------------
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gtt-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER:-gtt}:${POSTGRES_PASSWORD:-gtt}@postgres:5432/${POSTGRES_DB:-gtt}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@platform.io}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin12345}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+      - GENOMICS_URL=http://genomics-validation:8000
+      - PROTEIN_URL=http://protein-analysis-service:8001
+      - DRUG_URL=http://drug-discovery-service:8002
+      - HISTOPATHOLOGY_URL=http://histopathology-service:8003
+      - UPLOAD_DIR=/data/structures/uploads
+    volumes:
+      - bio-data:/data/structures
     depends_on:
-      - redis
-    networks:
-      - bio-network
+      postgres:
+        condition: service_healthy
+      genomics-validation:
+        condition: service_started
+      protein-analysis-service:
+        condition: service_started
+      drug-discovery-service:
+        condition: service_started
+      histopathology-service:
+        condition: service_started
+    networks: [bio-network]
+
+  # ---------------- Frontend ----------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    container_name: gtt-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    depends_on: [gateway]
+    networks: [bio-network]
 
 networks:
   bio-network:
@@ -67,4 +153,6 @@ networks:
 
 volumes:
   bio-data:
+    driver: local
+  pg-data:
     driver: local
