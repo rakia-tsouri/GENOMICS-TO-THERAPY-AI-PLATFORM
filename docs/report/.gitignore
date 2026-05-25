@@ -1,0 +1,12 @@
+# LaTeX build artifacts (regenerable). The compiled main.pdf is kept tracked.
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.synctex.gz

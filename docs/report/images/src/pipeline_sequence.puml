@@ -1,0 +1,70 @@
+@startuml pipeline_sequence
+title Diagramme de séquence - Exécution d'une analyse (job)
+
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Helvetica"
+skinparam sequenceMessageAlign center
+
+skinparam participant {
+  BackgroundColor #F4F8FB
+  BorderColor #2C3E50
+  FontColor #2C3E50
+}
+skinparam actor {
+  BackgroundColor #EAF2F8
+  BorderColor #2C3E50
+}
+skinparam database {
+  BackgroundColor #FDF2E9
+  BorderColor #B9770E
+}
+skinparam note {
+  BackgroundColor #FEF9E7
+  BorderColor #B7950B
+}
+skinparam ArrowColor #2C3E50
+skinparam sequenceLifeLineBorderColor #95A5A6
+
+actor "Chercheur" as Chercheur
+participant "Frontend" as Frontend
+participant "Gateway" as Gateway
+participant "GenomicsValidation" as GEN
+participant "ProteinAnalysis" as PROT
+participant "DrugDiscovery" as DRUG
+participant "Histopathology" as HIST
+database "DB" as DB
+
+Chercheur -> Frontend : Lancer une analyse
+Frontend -> Gateway : POST /api/v1/jobs
+Gateway -> DB : créer Job (status=pending)
+Gateway --> Frontend : 201 (id)
+Frontend --> Chercheur : Job créé
+
+note over Gateway, HIST : Tâche d'arrière-plan (asynchrone)\nChaque étape encapsulée dans try/except\n(tolérante aux pannes)
+
+Gateway -> GEN : /validate
+GEN --> Gateway : validation_result
+
+Gateway -> PROT : /analyze (meilleur ORF)
+PROT --> Gateway : analysis_result
+
+Gateway -> DRUG : /predict
+DRUG --> Gateway : drug_result
+
+Gateway -> HIST : /predict-mutation
+HIST --> Gateway : histopathology_result
+
+Gateway -> Gateway : fusion croisée
+Gateway -> DB : status=completed
+
+par Suivi en parallèle
+  loop polling toutes les 3 s
+    Frontend -> Gateway : GET /jobs/{id}
+    Gateway -> DB : lire l'état
+    DB --> Gateway : avancement
+    Gateway --> Frontend : retourne l'avancement
+  end
+end
+
+@enduml
