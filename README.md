@@ -75,7 +75,18 @@ Then open:
 
 - Frontend: http://localhost:3000
 - Gateway API docs (Swagger): http://localhost:8080/docs
-- A default admin is seeded from `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`).
+
+**Demo accounts** (seeded automatically, also shown on the login page):
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@medconnect.dev` | `admin12345` |
+| Researcher | `researcher@medconnect.dev` | `research12345` |
+
+**Sample inputs to try** (on *New analysis*):
+- Gene ID: `NM_000546` (TP53), `NM_007294` (BRCA1), `NM_005228` (EGFR) — fetched live from NCBI.
+- DNA: click *Load sample sequence* (works offline).
+- Histopathology (Track B demo): *Download a sample tissue image* and upload it.
 
 > **Heads up:** the `drug-discovery` and `histopathology` images pull large ML
 > deps (torch, torch-geometric, rdkit, torchvision) — the first build is slow.
