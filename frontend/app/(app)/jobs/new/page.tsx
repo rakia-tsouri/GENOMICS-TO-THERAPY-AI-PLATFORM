@@ -33,6 +33,16 @@ const SUGGESTED_MUTATIONS = [
   "NRAS",
 ];
 
+// Sample inputs so the platform is runnable out of the box.
+// Gene IDs are real RefSeq accessions (the genomics service fetches them from NCBI).
+const SAMPLE_GENE_IDS = [
+  { id: "NM_000546", label: "TP53 (NM_000546)" },
+  { id: "NM_007294", label: "BRCA1 (NM_007294)" },
+  { id: "NM_005228", label: "EGFR (NM_005228)" },
+];
+// A synthetic but valid ORF — works offline without an NCBI lookup.
+const SAMPLE_DNA = ">demo_ORF synthetic test sequence\nATG" + "GCT".repeat(50) + "TAA";
+
 type GenomicsMode = "dna" | "gene";
 
 function NewJobForm() {
@@ -234,6 +244,15 @@ function NewJobForm() {
                 htmlFor="dna"
                 hint="Paste raw nucleotides or a FASTA record. ACGT/N accepted."
               >
+                <div className="mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setDnaSequence(SAMPLE_DNA)}
+                    className="rounded-md border border-brand-300 bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 hover:bg-brand-100"
+                  >
+                    Load sample sequence
+                  </button>
+                </div>
                 <Textarea
                   id="dna"
                   value={dnaSequence}
@@ -246,14 +265,27 @@ function NewJobForm() {
               <Field
                 label="Gene ID"
                 htmlFor="gene"
-                hint="e.g. a HGNC symbol or Ensembl/Entrez ID (TP53, ENSG00000141510)."
+                hint="A RefSeq/GenBank accession the service fetches from NCBI (e.g. NM_000546)."
               >
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                  <span className="text-xs text-slate-500">Samples:</span>
+                  {SAMPLE_GENE_IDS.map((g) => (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => setGeneId(g.id)}
+                      className="rounded-md border border-brand-300 bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700 hover:bg-brand-100"
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
                 <Input
                   id="gene"
                   className="font-mono"
                   value={geneId}
                   onChange={(e) => setGeneId(e.target.value)}
-                  placeholder="TP53"
+                  placeholder="NM_000546"
                 />
               </Field>
             )}
@@ -271,6 +303,17 @@ function NewJobForm() {
               <span className="font-semibold">Demo:</span> the Track&nbsp;B model is
               not trained yet — predictions are illustrative of the pipeline, not valid results.
             </div>
+            <p className="text-xs text-slate-500">
+              No slide handy?{" "}
+              <a
+                href="/sample-tissue.png"
+                download
+                className="font-medium text-brand-600 hover:text-brand-700"
+              >
+                Download a sample tissue image
+              </a>{" "}
+              and upload it below.
+            </p>
             <input
               ref={fileInputRef}
               type="file"

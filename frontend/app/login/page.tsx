@@ -10,6 +10,11 @@ import Button from "@/components/Button";
 import { Field, Input } from "@/components/Input";
 import { ErrorBanner, PageSpinner } from "@/components/Feedback";
 
+const DEMO_ACCOUNTS = [
+  { role: "Admin", email: "admin@medconnect.dev", password: "admin12345" },
+  { role: "Researcher", email: "researcher@medconnect.dev", password: "research12345" },
+];
+
 export default function LoginPage() {
   const { login, user, loading } = useAuth();
   const router = useRouter();
@@ -97,7 +102,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@lab.org"
+                placeholder="admin@medconnect.dev"
               />
             </Field>
             <Field label="Password" htmlFor="password" required>
@@ -115,6 +120,34 @@ export default function LoginPage() {
               Sign in
             </Button>
           </form>
+
+          {/* Demo credentials — seeded automatically by the gateway */}
+          <div className="mt-6 rounded-lg border border-brand-200 bg-brand-50/60 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
+              Demo accounts
+            </p>
+            <div className="mt-2 space-y-1.5">
+              {DEMO_ACCOUNTS.map((a) => (
+                <div key={a.email} className="flex items-center justify-between gap-2 text-xs">
+                  <span className="text-slate-600">
+                    <span className="font-medium text-slate-800">{a.role}</span>{" "}
+                    <span className="font-mono">{a.email}</span> ·{" "}
+                    <span className="font-mono">{a.password}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail(a.email);
+                      setPassword(a.password);
+                    }}
+                    className="shrink-0 rounded-md border border-brand-300 bg-white px-2 py-1 font-medium text-brand-700 hover:bg-brand-100"
+                  >
+                    Use
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Don&apos;t have an account?{" "}
