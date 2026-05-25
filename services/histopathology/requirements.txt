@@ -3,8 +3,8 @@ uvicorn
 pydantic
 numpy
 pillow
-torch
-torchvision
+# torch & torchvision are installed CPU-only from the PyTorch CPU index in the
+# Dockerfile (this service runs on CPU; the CUDA build is ~1.5 GB of dead weight).
 opencv-python-headless
 scikit-image
 python-multipart
