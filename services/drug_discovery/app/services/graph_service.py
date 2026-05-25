@@ -1,4 +1,4 @@
-from ..ml.dataset import smiles_to_graph, pdb_to_graph
+from ml.dataset import smiles_to_graph, pdb_to_graph
 from torch_geometric.data import Data
 from typing import List, Optional
 
