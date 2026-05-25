@@ -25,11 +25,16 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24  # 1 day
 
-    # --- Seed admin (created on first startup if no users exist) ---
-    # NOTE: must be a valid, non-reserved email domain (email-validator rejects
-    # special-use TLDs like .local/.test), otherwise the seeded admin cannot log in.
-    admin_email: str = "admin@platform.io"
-    admin_password: str = "admin12345"
+    # --- Demo seeding (idempotent: demo accounts + a sample project) ---
+    # These credentials are shown on the login page so the platform is usable
+    # out of the box. Disable with SEED_DEMO=false in production.
+    # NOTE: use a valid, non-reserved email domain (email-validator rejects
+    # special-use TLDs like .local/.test), otherwise the seeded user can't log in.
+    seed_demo: bool = True
+    demo_admin_email: str = "admin@medconnect.dev"
+    demo_admin_password: str = "admin12345"
+    demo_researcher_email: str = "researcher@medconnect.dev"
+    demo_researcher_password: str = "research12345"
 
     # --- Downstream microservice URLs ---
     genomics_url: str = "http://genomics-validation:8000"

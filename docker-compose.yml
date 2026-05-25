@@ -109,8 +109,11 @@ services:
     environment:
       - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER:-gtt}:${POSTGRES_PASSWORD:-gtt}@postgres:5432/${POSTGRES_DB:-gtt}
       - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
-      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@platform.io}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin12345}
+      - SEED_DEMO=${SEED_DEMO:-true}
+      - DEMO_ADMIN_EMAIL=${DEMO_ADMIN_EMAIL:-admin@medconnect.dev}
+      - DEMO_ADMIN_PASSWORD=${DEMO_ADMIN_PASSWORD:-admin12345}
+      - DEMO_RESEARCHER_EMAIL=${DEMO_RESEARCHER_EMAIL:-researcher@medconnect.dev}
+      - DEMO_RESEARCHER_PASSWORD=${DEMO_RESEARCHER_PASSWORD:-research12345}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
       - GENOMICS_URL=http://genomics-validation:8000
       - PROTEIN_URL=http://protein-analysis-service:8001

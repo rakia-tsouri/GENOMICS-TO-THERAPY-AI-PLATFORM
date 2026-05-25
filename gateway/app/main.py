@@ -13,10 +13,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .database import Base, SessionLocal, engine
-from .models import User
-from .security import hash_password
+from .database import Base, engine, wait_for_db
 from .routers import auth, jobs, projects, reports, uploads, users
+from .seed import seed_demo
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("gateway")
@@ -32,28 +31,11 @@ app.add_middleware(
 )
 
 
-def _seed_admin() -> None:
-    db = SessionLocal()
-    try:
-        if db.query(User).count() == 0:
-            db.add(
-                User(
-                    email=settings.admin_email,
-                    full_name="Platform Admin",
-                    hashed_password=hash_password(settings.admin_password),
-                    role="admin",
-                )
-            )
-            db.commit()
-            logger.info("Seeded default admin user: %s", settings.admin_email)
-    finally:
-        db.close()
-
-
 @app.on_event("startup")
 def on_startup() -> None:
+    wait_for_db()  # tolerate Postgres not being ready/resolvable yet
     Base.metadata.create_all(bind=engine)
-    _seed_admin()
+    seed_demo()
     logger.info("Gateway ready. DB=%s", settings.database_url.split("@")[-1])
 
 
