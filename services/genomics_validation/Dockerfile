@@ -6,9 +6,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy shared models and application code
+# Copy shared models and application code (build context = this service dir)
 COPY shared/ /app/shared/
-COPY genomics_validation/api/ /app/api/
+COPY api/ /app/api/
 
 ENV PYTHONPATH=/app
 ENV REDIS_HOST=redis

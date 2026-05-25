@@ -1,6 +1,6 @@
 import torch
 import os
-from ..ml.model import DrugProteinGNN
+from ml.model import DrugProteinGNN
 from torch_geometric.data import Batch
 
 class GNNService:
