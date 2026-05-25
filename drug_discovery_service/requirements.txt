@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+torch
+torch-geometric
+rdkit-pypi
+biopython
+httpx
+redis
+py3Dmol
+numpy
+pandas
+scikit-learn
+python-multipart
+python-dotenv

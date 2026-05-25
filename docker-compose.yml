@@ -41,6 +41,26 @@ services:
     networks:
       - bio-network
 
+  drug-discovery-service:
+    build:
+      context: ./drug_discovery_service
+      dockerfile: Dockerfile
+    container_name: drug-discovery-service
+    ports:
+      - "8002:8002"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CHEMBL_API_URL=https://www.ebi.ac.uk/chembl/api/data
+      - MODEL_PATH=/app/models_saved/gnn_v1.pt
+      - PDB_VOLUME=/data/structures
+    volumes:
+      - bio-data:/data/structures
+    depends_on:
+      - redis
+    networks:
+      - bio-network
+
 networks:
   bio-network:
     driver: bridge
