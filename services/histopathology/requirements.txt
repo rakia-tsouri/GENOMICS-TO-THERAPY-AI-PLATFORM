@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+numpy
+pillow
+# torch & torchvision are installed CPU-only from the PyTorch CPU index in the
+# Dockerfile (this service runs on CPU; the CUDA build is ~1.5 GB of dead weight).
+opencv-python-headless
+scikit-image
+python-multipart
+# openslide-python is OPTIONAL: only needed to read real .svs/.ndpi WSIs.
+# It is import-guarded in patch_service.py so the service runs without it
+# (it falls back to PIL/numpy for plain images). Uncomment to enable real WSI support,
+# noting it also requires the OpenSlide C library installed in the image.
+# openslide-python

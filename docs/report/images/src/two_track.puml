@@ -1,0 +1,57 @@
+@startuml two_track
+title Pipeline multi-modal - Track A et Track B
+
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Helvetica"
+skinparam ArrowColor #2C3E50
+
+skinparam activity {
+  BackgroundColor #F4F8FB
+  BorderColor #2C3E50
+  FontColor #2C3E50
+  DiamondBackgroundColor #FDF2E9
+  DiamondBorderColor #B9770E
+  BarColor #2C3E50
+  StartColor #27AE60
+  EndColor #C0392B
+}
+skinparam partition {
+  BorderColor #7F8C8D
+  FontColor #2C3E50
+}
+skinparam note {
+  BackgroundColor #FEF9E7
+  BorderColor #B7950B
+}
+
+start
+
+fork
+  partition "Track A (Analyse génomique)" {
+    :Séquence ADN;
+    :Validation (ATG/ORF);
+    :Traduction;
+    :BLAST / UniProt;
+    :Fold check;
+    :Structure 3D\n(AlphaFold / ESMFold);
+  }
+fork again
+  partition "Track B (Analyse histopathologique)" {
+    :Image WSI;
+    note right: (modèle non entraîné - démonstration)
+    :Extraction de patchs;
+    :CNN (ResNet50);
+    :Agrégation MIL;
+    :Prédiction de mutation;
+    :Grad-CAM;
+  }
+end fork
+
+:Couche de fusion\n(validation croisée des mutations);
+:Découverte de médicaments\n(pochettes -> graphes -> GNN -> classement);
+:Rapport final;
+
+stop
+
+@enduml

@@ -1,0 +1,63 @@
+@startuml architecture
+title Diagramme de composants - Architecture de la plateforme
+
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Helvetica"
+skinparam componentStyle rectangle
+
+skinparam component {
+  BackgroundColor #F4F8FB
+  BorderColor #2C3E50
+  FontColor #2C3E50
+}
+skinparam database {
+  BackgroundColor #FDF2E9
+  BorderColor #B9770E
+}
+skinparam node {
+  BackgroundColor #FBFCFD
+  BorderColor #95A5A6
+}
+skinparam package {
+  BackgroundColor #FBFCFD
+  BorderColor #7F8C8D
+}
+skinparam ArrowColor #2C3E50
+
+component "Frontend Next.js (:3000)" as FE
+component "API Gateway FastAPI (:8080)" as GW
+
+database "PostgreSQL (:5432)" as PG
+database "Redis (:6379)" as REDIS
+artifact "Volume partagé\nbio-data (/data/structures)" as VOL
+
+package "Track A (Analyse génomique)" #EAF2F8 {
+  component "genomics-validation (:8000)\n/api/v1/validate" as GEN
+  component "protein-analysis (:8001)\n/api/v1/analyze" as PROT
+  component "drug-discovery (:8002)\n/api/v1/predict" as DRUG
+}
+
+package "Track B (Analyse histopathologique)" #FEF9E7 {
+  component "histopathology (:8003)\n/api/v1/predict-mutation" as HIST
+}
+
+FE --> GW : HTTP / JWT
+
+GW --> PG
+GW --> GEN
+GW --> PROT
+GW --> DRUG
+GW --> HIST
+
+GEN --> REDIS : cache
+PROT --> REDIS : cache
+DRUG --> REDIS : cache
+HIST --> REDIS : cache
+
+PROT ..> VOL : monte
+DRUG ..> VOL : monte
+HIST ..> VOL : monte
+GW ..> VOL : monte
+
+@enduml

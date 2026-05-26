@@ -1,0 +1,85 @@
+@startuml deployment
+title Diagramme de déploiement - Conteneurs Docker et services externes
+
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Helvetica"
+skinparam ArrowColor #2C3E50
+
+skinparam node {
+  BackgroundColor #FBFCFD
+  BorderColor #95A5A6
+  FontColor #2C3E50
+}
+skinparam component {
+  BackgroundColor #F4F8FB
+  BorderColor #2C3E50
+  FontColor #2C3E50
+}
+skinparam database {
+  BackgroundColor #FDF2E9
+  BorderColor #B9770E
+}
+skinparam artifact {
+  BackgroundColor #F9EBEA
+  BorderColor #922B21
+}
+skinparam cloud {
+  BackgroundColor #EAF2F8
+  BorderColor #2471A3
+}
+skinparam package {
+  BackgroundColor #FDFEFE
+  BorderColor #7F8C8D
+}
+
+node "Hôte Docker" as HOST {
+
+  package "Réseau : bio-network" as NET #EBF5FB {
+    database "postgres" as PG
+    database "redis" as REDIS
+    component "genomics-validation" as GEN
+    component "protein-analysis-service" as PROT
+    component "drug-discovery-service" as DRUG
+    component "histopathology-service" as HIST
+    component "gateway" as GW
+    component "frontend" as FE
+  }
+
+  artifact "Volume\nbio-data" as VOLBIO
+  artifact "Volume\npg-data" as VOLPG
+}
+
+GW --> PG
+GW --> REDIS
+GW --> GEN
+GW --> PROT
+GW --> DRUG
+GW --> HIST
+FE --> GW
+
+PG ..> VOLPG : persiste
+PROT ..> VOLBIO
+DRUG ..> VOLBIO
+HIST ..> VOLBIO
+GW ..> VOLBIO
+
+cloud "APIs externes (Cloud)" as EXT #EAF2F8 {
+  component "NCBI Entrez" as NCBIE
+  component "NCBI BLAST" as NCBIB
+  component "UniProt" as UNIPROT
+  component "AlphaFold DB" as AFDB
+  component "ESMFold" as ESM
+  component "RCSB PDB" as PDB
+  component "ChEMBL" as CHEMBL
+}
+
+GEN --> NCBIE
+GEN --> NCBIB
+PROT --> UNIPROT
+PROT --> AFDB
+PROT --> ESM
+PROT --> PDB
+DRUG --> CHEMBL
+
+@enduml

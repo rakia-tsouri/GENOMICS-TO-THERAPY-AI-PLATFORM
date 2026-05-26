@@ -1,0 +1,71 @@
+@startuml class_model
+title Modèle de données du Gateway (diagramme de classes / ER)
+
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Helvetica"
+skinparam linetype ortho
+skinparam ArrowColor #2C3E50
+
+skinparam class {
+  BackgroundColor #F4F8FB
+  BorderColor #2C3E50
+  HeaderBackgroundColor #D6EAF8
+  FontColor #2C3E50
+  AttributeFontColor #34495E
+}
+
+class User {
+  +id : int
+  email : str
+  full_name : str
+  hashed_password : str
+  role : str (researcher|admin)
+  is_active : bool
+  created_at : datetime
+}
+
+class Project {
+  +id : int
+  name : str
+  description : str
+  cancer_type : str
+  owner_id : FK
+  created_at : datetime
+}
+
+class Job {
+  +id : int
+  name : str
+  status : str
+  current_step : str
+  error : str
+  gene_id : str
+  dna_sequence : str
+  wsi_image_path : str
+  target_mutations : json
+  validation_result : json
+  analysis_result : json
+  drug_result : json
+  histopathology_result : json
+  fusion_result : json
+  created_at : datetime
+  completed_at : datetime
+}
+
+class Report {
+  +id : int
+  job_id : FK
+  owner_id : FK
+  title : str
+  summary : json
+  created_at : datetime
+}
+
+User "1" -- "*" Project
+User "1" -- "*" Job
+Project "1" -- "*" Job
+Job "1" -- "*" Report
+User "1" -- "*" Report
+
+@enduml

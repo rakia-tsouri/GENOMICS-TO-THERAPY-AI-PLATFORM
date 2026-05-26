@@ -1,0 +1,51 @@
+@startuml usecase
+title Diagramme de cas d'utilisation - Plateforme Génomique vers Thérapie
+
+skinparam shadowing false
+skinparam monochrome false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Helvetica"
+skinparam actorStyle awesome
+
+skinparam usecase {
+  BackgroundColor #F4F8FB
+  BorderColor #2C3E50
+  ArrowColor #2C3E50
+  FontColor #2C3E50
+}
+skinparam actor {
+  BackgroundColor #EAF2F8
+  BorderColor #2C3E50
+}
+skinparam package {
+  BackgroundColor #FBFCFD
+  BorderColor #95A5A6
+}
+
+left to right direction
+
+actor "Chercheur" as Chercheur
+actor "Administrateur" as Admin
+
+Admin --|> Chercheur
+
+rectangle "Plateforme" {
+  usecase "S'inscrire / Se connecter" as UC_Auth
+  usecase "Gérer ses projets" as UC_Projets
+  usecase "Lancer une analyse\n(séquence ADN et/ou image WSI)" as UC_Analyse
+  usecase "Suivre l'avancement" as UC_Suivi
+  usecase "Consulter les résultats" as UC_Resultats
+  usecase "Générer et exporter\nun rapport" as UC_Rapport
+  usecase "Gérer les utilisateurs\n(rôles, activation, suppression)" as UC_Users
+}
+
+Chercheur --> UC_Auth
+Chercheur --> UC_Projets
+Chercheur --> UC_Analyse
+Chercheur --> UC_Suivi
+Chercheur --> UC_Resultats
+Chercheur --> UC_Rapport
+
+Admin --> UC_Users
+
+@enduml

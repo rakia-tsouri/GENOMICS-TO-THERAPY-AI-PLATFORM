@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+# torch is installed CPU-only from the PyTorch CPU index in the Dockerfile.
+torch-geometric
+rdkit
+biopython
+httpx
+redis
+py3Dmol
+numpy
+pandas
+scikit-learn
+tqdm
+python-multipart
+python-dotenv
