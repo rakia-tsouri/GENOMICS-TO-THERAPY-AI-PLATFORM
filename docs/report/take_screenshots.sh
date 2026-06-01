@@ -17,10 +17,26 @@ SHOTS="$(cd "$(dirname "$0")" && pwd)/images/screenshots"
 mkdir -p "$SHOTS"
 rm -f "$SHOTS"/*.png
 
+# 0. wait for gateway + frontend to be reachable (cold-start can take 30-60s
+#    while the gateway waits for postgres and runs its seed)
+echo "Waiting for services..."
+for i in $(seq 1 40); do
+  ok_gw=$(curl -fs -m 3 http://localhost:8080/health 2>/dev/null | grep -c healthy || true)
+  ok_fe=$(curl -fs -m 3 -o /dev/null -w '%{http_code}' http://localhost:3000/login)
+  [ "$ok_gw" = "1" ] && [ "$ok_fe" = "200" ] && break
+  sleep 2
+done
+echo "  gateway /health: ok=$ok_gw    frontend /login: HTTP=$ok_fe"
+
 # 1. login as the seeded demo researcher
-TOK=$(curl -fs -X POST "$GW/auth/login" -H 'Content-Type: application/json' \
-  -d '{"email":"researcher@medconnect.dev","password":"research12345"}' \
-  | python3 -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
+LOGIN=$(curl -fs -X POST "$GW/auth/login" -H 'Content-Type: application/json' \
+  -d '{"email":"researcher@medconnect.dev","password":"research12345"}')
+if [ -z "$LOGIN" ]; then
+  echo "ERROR: gateway did not return a login response. Is 'docker compose up' done seeding?"
+  echo "  try: docker logs gtt-gateway | tail -20"
+  exit 1
+fi
+TOK=$(echo "$LOGIN" | python3 -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
 
 # 2. pick a seeded job/report (first one, which is the oldest = TP53 reference)
 JID=$(curl -fs "$GW/jobs" -H "Authorization: Bearer $TOK" \
