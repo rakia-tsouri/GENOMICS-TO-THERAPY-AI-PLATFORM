@@ -8,7 +8,12 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Copy source and build
+# Copy source and build.
+# Next.js inlines NEXT_PUBLIC_* env vars at BUILD TIME, so the gateway URL
+# must be present during `next build` — receive it from docker-compose's
+# build arg and expose it to the build step.
+ARG NEXT_PUBLIC_API_URL=http://localhost:8080
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY . .
 RUN npm run build
 
