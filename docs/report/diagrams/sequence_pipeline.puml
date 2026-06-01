@@ -1,0 +1,62 @@
+@startuml sequence_pipeline
+skinparam backgroundColor #FEFEFE
+skinparam sequence {
+  ArrowColor #2E86C1
+  ActorBorderColor #2E86C1
+  LifeLineBorderColor #2E86C1
+  ParticipantBackgroundColor #EBF5FB
+  ParticipantBorderColor #2E86C1
+}
+
+actor Chercheur as U
+participant "Frontend\n(Next.js)" as FE
+participant "Gateway\n(FastAPI)" as GW
+database "PostgreSQL" as DB
+participant "Genomics\n:8000" as GEN
+participant "Protein\n:8001" as PROT
+participant "Drug\n:8002" as DRUG
+participant "Histopath.\n:8003" as HISTO
+
+== Soumission de l'analyse ==
+U -> FE : Soumet ADN + Image WSI
+FE -> GW : POST /api/v1/jobs
+GW -> DB : INSERT Job (status=pending)
+GW --> FE : 202 Accepted {job_id}
+FE --> U : Affiche "Analyse en cours..."
+
+== Exécution du Pipeline (tâche arrière-plan) ==
+
+GW -> GW : BackgroundTask: run_pipeline(job_id)
+
+group Track A — Piste Génomique
+  GW -> GEN : POST /api/v1/validate\n{dna_sequence, gene_id}
+  GEN --> GW : ValidationResponse\n{valid, orfs[], gc_percent}
+  GW -> DB : UPDATE Job (validation_result, step=analyzing)
+  GW -> PROT : POST /api/v1/analyze\n{protein_seq, gene_id}
+  PROT --> GW : AnalysisResponse\n{blast, annotation, structure_3d}
+  GW -> DB : UPDATE Job (analysis_result, step=predicting_drugs)
+  GW -> DRUG : POST /api/v1/predict\n{structure_3d, annotation}
+  DRUG --> GW : PredictResponse\n{pocket, top_candidates[10]}
+  GW -> DB : UPDATE Job (drug_result)
+end
+
+group Track B — Piste Histopathologique
+  GW -> HISTO : POST /api/v1/predict-mutation\n{wsi_image_path, target_mutations}
+  HISTO --> GW : HistopathologyResponse\n{mutations[], gradcam_path}
+  GW -> DB : UPDATE Job (histopathology_result)
+end
+
+group Fusion Multimodale
+  GW -> GW : run_fusion(analysis_result, histo_result)
+  GW -> DB : UPDATE Job (fusion_result, status=completed)
+end
+
+== Consultation des résultats ==
+U -> FE : Consulte les résultats
+FE -> GW : GET /api/v1/jobs/{id}
+GW -> DB : SELECT Job
+DB --> GW : Job complet
+GW --> FE : Résultats complets
+FE --> U : Affiche protéine 3D,\nTop 10 médicaments,\ncarte Grad-CAM, fusion
+
+@enduml

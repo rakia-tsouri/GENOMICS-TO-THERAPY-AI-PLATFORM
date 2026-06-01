@@ -1,0 +1,57 @@
+@startuml activity_genomics
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor #EBF5FB
+  BorderColor #2E86C1
+  ArrowColor #2E86C1
+  StartColor #2E86C1
+  EndColor #2E86C1
+}
+
+start
+
+:Réception de la requête\n(gene_id OU dna_sequence);
+
+if (gene_id fourni et pas de séquence ?) then (oui)
+  :Vérifier le cache Redis;
+  if (Cache hit ?) then (oui)
+    :Lire la séquence du cache;
+  else (non)
+    :Appel NCBI Entrez (efetch);
+    :Stocker en cache Redis (TTL 24h);
+  endif
+endif
+
+:Nettoyage de la séquence\n(suppression espaces, chiffres);
+:Détection format FASTA\n(extraction gene_id depuis l'en-tête);
+
+:Validation biologique;
+if (Longueur < 150 bp ou > 100k bp ?) then (oui)
+  :Retourner ERREUR\n"Sequence too short/long";
+  stop
+endif
+
+if (Caractères invalides (non ATCGN) ?) then (oui)
+  :Retourner ERREUR\n"Invalid nucleotides";
+  stop
+endif
+
+:Calcul du taux GC%;
+if (GC% < 35% ou > 65% ?) then (oui)
+  :Ajouter AVERTISSEMENT\n"Atypical GC content";
+endif
+
+:Recherche des ORFs\n(3 cadres de lecture directs);
+if (Aucun ORF trouvé ?) then (oui)
+  :Retourner ERREUR\n"No valid ORF found";
+  stop
+endif
+
+:Trier les ORFs par longueur décroissante;
+:Traduire chaque ORF en\nséquence d'acides aminés (BioPython);
+
+:Retourner ValidationResponse\n{valid=true, orfs[], gc_percent, dna_length};
+
+stop
+
+@enduml

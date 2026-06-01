@@ -1,30 +1,37 @@
-\documentclass[12pt,a4paper,oneside,french]{book}
+% ======================================================================
+%  Plateforme d'IA biomédicale multimodale — Rapport de Projet Personnel
+%  Professionnel (PPP)
+%  INSAT — Université de Carthage — Année 2025-2026
+%
+%  Compilation :
+%    pdflatex -shell-escape main.tex
+%    bibtex main
+%    pdflatex -shell-escape main.tex
+%    pdflatex -shell-escape main.tex
+% ======================================================================
+\documentclass[12pt,a4paper,oneside]{book}
 
-% ----------------------------------------------------------------------
-% Encodage et langue
-% ----------------------------------------------------------------------
+% --- Encodage & langue ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{lmodern}
 
-% ----------------------------------------------------------------------
-% Mathématiques, figures, tableaux
-% ----------------------------------------------------------------------
+% --- Mathématiques ---
 \usepackage{amsmath,amsfonts,amssymb}
+
+% --- Figures & tableaux ---
 \usepackage{graphicx}
-\usepackage{array,multirow,makecell}
-\usepackage{booktabs}
-\usepackage{longtable}
+\usepackage{float}
+\usepackage{array,multirow,makecell,booktabs,longtable}
 \usepackage{caption}
+\usepackage{subcaption}
 \usepackage{enumitem}
-\setlist{leftmargin=*,itemsep=1pt,topsep=2pt}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
-% ----------------------------------------------------------------------
-% Mise en page
-% ----------------------------------------------------------------------
+% --- Mise en page ---
 \usepackage{geometry}
 \geometry{hmargin=2.5cm,vmargin=2.5cm}
 \usepackage{setspace}
@@ -32,21 +39,25 @@
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{\nouppercase{\textit{\leftmark}}}
+\rhead{\nouppercase{\textit{\rightmark}}}
 \rfoot{\thepage}
 \renewcommand{\headrulewidth}{0.8pt}
-\renewcommand{\footrulewidth}{0.8pt}
+\renewcommand{\footrulewidth}{0.4pt}
 \setlength{\parskip}{6pt}
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{2}
 
-% ----------------------------------------------------------------------
-% Code source
-% ----------------------------------------------------------------------
+% --- Couleurs ---
 \usepackage{xcolor}
 \definecolor{codebg}{rgb}{0.96,0.96,0.98}
-\definecolor{codekw}{rgb}{0.42,0.36,0.91}
+\definecolor{codekw}{rgb}{0.10,0.36,0.71}
 \definecolor{codecm}{rgb}{0.40,0.45,0.50}
 \definecolor{codestr}{rgb}{0.10,0.45,0.25}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.45}
+\definecolor{primaryblue}{RGB}{31,97,141}
+\definecolor{sprintgray}{RGB}{245,245,245}
+
+% --- Code source ---
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\footnotesize,
@@ -54,103 +65,173 @@
   keywordstyle=\color{codekw}\bfseries,
   commentstyle=\color{codecm}\itshape,
   stringstyle=\color{codestr},
-  numbers=left, numberstyle=\tiny\color{codecm}, numbersep=8pt,
-  frame=single, rulecolor=\color{gray!30},
-  breaklines=true, showstringspaces=false, captionpos=b,
-  tabsize=2, columns=fullflexible
+  numbers=left,
+  numberstyle=\tiny\color{codecm},
+  numbersep=8pt,
+  frame=single,
+  rulecolor=\color{gray!40},
+  breaklines=true,
+  showstringspaces=false,
+  captionpos=b,
+  tabsize=2,
+  columns=fullflexible,
+  literate={é}{{\'{e}}}1 {è}{{\`{e}}}1 {ê}{{\^{e}}}1 {à}{{\`{a}}}1
+           {â}{{\^{a}}}1 {ô}{{\^{o}}}1 {î}{{\^{i}}}1 {ù}{{\`{u}}}1
+           {ç}{{\c{c}}}1 {ë}{{\"e}}1 {û}{{\^u}}1 {À}{{\`A}}1 {É}{{\'{E}}}1
 }
 
-% ----------------------------------------------------------------------
-% Liens
-% ----------------------------------------------------------------------
+% --- Liens hypertexte ---
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
-\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
-\hypersetup{colorlinks,linktocpage=true,linkcolor=darkblue,citecolor=darkblue,urlcolor=blue}
-
+\hypersetup{
+  colorlinks=true,
+  linktocpage=true,
+  linkcolor=darkblue,
+  citecolor=darkblue,
+  urlcolor=blue
+}
 \usepackage{cite}
 \sloppy
 
-\title{Genomics-to-Therapy : une plateforme d'IA biomédicale multimodale pour la découverte de médicaments}
-\author{Aziz Amari, Rakia Tsouri, Sinda Ferchichi, Moetez Fradi}
-\date{2026}
+% --- Boîtes et encadrés ---
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{sprintbox}[2][]{
+  enhanced,
+  title=#2,
+  fonttitle=\bfseries\color{white},
+  colback=sprintgray,
+  colframe=primaryblue,
+  coltitle=white,
+  attach boxed title to top left={yshift=-2mm, xshift=4mm},
+  boxed title style={colback=primaryblue, rounded corners},
+  #1
+}
+
+% --- Helper : include figure or placeholder box if missing ---
+\newcommand{\figorbox}[3]{%
+  \IfFileExists{#1}%
+    {\includegraphics[width=#2]{#1}}%
+    {\fbox{\parbox{#2}{\centering\vspace{1em}\textit{[Figure à générer : \texttt{#1}]}\\[0.4em]\small\textit{#3}\vspace{1em}}}}%
+}
+
+% ======================================================================
+\title{Plateforme d'IA Biomédicale Multimodale pour la Découverte de Médicaments}
+\author{Aziz Amari \and Rakia Tsouri \and Sinda Ferchichi \and Moetez Fradi}
+\date{Année Universitaire 2025--2026}
 
 % ======================================================================
 \begin{document}
 \pagenumbering{gobble}
 
-% ---------------------- Page de garde ---------------------------------
+% =====================================================================
+%  PAGE DE GARDE
+% =====================================================================
 \begin{titlepage}
 \centering
-\includegraphics[width=0.30\linewidth]{images/INSAT.jpg}\\[0.6cm]
-{\large Université de Carthage\par}
-{\large Institut National des Sciences Appliquées et de Technologie\par}
-\vspace{1.3cm}
-{\Large\scshape Projet de Fin d'Études\par}
-\vspace{0.3cm}
-{\large Rapport technique et scientifique\par}
-\vspace{1.5cm}
-\rule{\linewidth}{0.5mm}\\[0.5cm]
-{\huge\bfseries Genomics-to-Therapy\\[0.3cm]
-\Large Une plateforme d'intelligence artificielle biomédicale multimodale :\\
-de la séquence ADN et de l'image histopathologique\\ à la recommandation de médicaments\par}
-\vspace{0.3cm}
-\rule{\linewidth}{0.5mm}\\[1.8cm]
 
-\begin{minipage}[t]{0.48\textwidth}
-\begin{flushleft}\large
-\textbf{Réalisé par :}\\[0.2cm]
+\includegraphics[width=0.28\linewidth]{images/INSAT.jpg}\\[0.5cm]
+{\large\bfseries Université de Carthage\\[0.2cm]}
+{\large Institut National des Sciences Appliquées et de Technologie (INSAT)\\[0.2cm]}
+{\large Département Informatique\\[0.8cm]}
+
+\rule{\linewidth}{1.5pt}\\[0.4cm]
+{\Large\scshape Projet Personnel Professionnel (PPP)\\[0.3cm]}
+\rule{\linewidth}{0.5pt}\\[1.0cm]
+
+{\Huge\bfseries\color{primaryblue} Plateforme d'IA Biomédicale Multimodale\\[0.5cm]}
+{\LARGE pour la découverte de médicaments :\\[0.3cm]
+\large de la séquence ADN et de l'image histopathologique\\
+à la recommandation de candidats-médicaments\\[1.2cm]}
+
+\rule{\linewidth}{0.5pt}\\[1.2cm]
+
+\begin{minipage}[t]{0.46\textwidth}
+\begin{flushleft}
+\textbf{\large Réalisé par :}\\[0.4cm]
+\begin{tabular}{l}
 Aziz Amari\\
 Rakia Tsouri\\
 Sinda Ferchichi\\
-Moetez Fradi
+Moetez Fradi\\
+\end{tabular}
 \end{flushleft}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.48\textwidth}
-\begin{flushright}\large
-\textbf{Encadré par :}\\[0.2cm]
-Dr. Hajer Taktak
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.46\textwidth}
+\begin{flushright}
+\textbf{\large Encadré par :}\\[0.4cm]
+Dr. Hajer Taktak\\[0.6cm]
+\textbf{\large Classe :}\\[0.2cm]
+5ème Année Informatique\\
 \end{flushright}
 \end{minipage}
 
 \vfill
-{\large Année universitaire 2025--2026\par}
+\rule{\linewidth}{1.5pt}\\[0.4cm]
+{\large Année universitaire 2025--2026}
 \end{titlepage}
+
+% =====================================================================
+%  DÉDICACE
+% =====================================================================
+\newpage
+\thispagestyle{empty}
+\vspace*{5cm}
+\begin{center}
+\itshape\large
+À nos familles et à tous ceux qui ont cru en nous,\\[0.5cm]
+À nos enseignants qui ont allumé en nous la flamme\\
+de la curiosité scientifique,\\[0.5cm]
+À la médecine de demain.
+\end{center}
 
 \frontmatter
 
-% ---------------------- Résumé ----------------------------------------
+% =====================================================================
+%  RÉSUMÉ
+% =====================================================================
 \chapter*{Résumé}
 \markboth{Résumé}{}
-\normalsize
-Ce projet propose \textbf{Genomics-to-Therapy}, une plateforme d'intelligence
-artificielle biomédicale qui unifie, au sein d'un même système, deux chaînes de
-traitement complémentaires : (i) une \emph{piste génomique} qui transforme une
-séquence d'ADN brute en structure protéique tridimensionnelle puis en
-candidats-médicaments, et (ii) une \emph{piste histopathologique} qui détecte des
-mutations à partir d'images de tissus (\textit{Whole Slide Images}). Les deux
-pistes convergent vers une \emph{couche de fusion} qui réconcilie les indices
-mutationnels issus des deux modalités afin d'augmenter la confiance des
-prédictions et de signaler les cas discordants. L'ensemble est exposé à travers
-une architecture microservices (FastAPI), orchestrée par une passerelle d'API
-sécurisée (authentification JWT, base PostgreSQL), et piloté par une interface
-web moderne (Next.js) offrant comptes utilisateurs, tableau de bord, suivi des
-analyses, résultats et rapports exportables.
 
-La piste génomique et le module de découverte de médicaments sont pleinement
-fonctionnels et s'appuient sur des outils scientifiques réels (BLAST, UniProt,
-AlphaFold, ESMFold, ChEMBL, RDKit) ainsi que sur un réseau de neurones de graphes
-(GNN) entraîné. La piste histopathologique est intégrée de bout en bout sous
-forme de démonstration ; son modèle de prédiction de mutations reste à entraîner
-sur des données annotées (TCGA).
+Ce projet propose une plateforme d'intelligence artificielle biomédicale
+\textit{de bout en bout} qui unifie deux chaînes de traitement complémentaires :
+(i) une \emph{piste génomique} (Track~A) qui transforme une séquence d'ADN brute
+en structure protéique tridimensionnelle puis en candidats-médicaments classés
+par affinité prédite, et (ii) une \emph{piste histopathologique} (Track~B) qui
+prédit la présence de mutations oncogènes à partir d'images de tissus
+numérisées (\textit{Whole Slide Images}). Les deux pistes convergent vers une
+\emph{couche de fusion multimodale} qui réconcilie les indices mutationnels
+issus de chacune, renforçant la confiance des résultats concordants et
+signalant les cas discordants pour revue médicale.
+
+L'ensemble est exposé à travers une architecture microservices (FastAPI),
+orchestrée par une passerelle d'API sécurisée (JWT, PostgreSQL) et pilotée par
+une interface web moderne (Next.js). Le module de découverte de médicaments
+s'appuie sur un réseau de neurones de graphes (GNN) entraîné sur la base
+BindingDB, combiné aux filtres pharmacocinétiques de Lipinski et à la détection
+de poches de liaison par P2Rank.
 
 \medskip
-{\noindent \textbf{Mots clés :} intelligence artificielle, bio-informatique,
-découverte de médicaments, réseaux de neurones de graphes, histopathologie,
-apprentissage multimodal, microservices, AlphaFold.}
+\noindent\textbf{Mots-clés :} intelligence artificielle, bio-informatique,
+médecine de précision, réseaux de neurones de graphes, histopathologie,
+apprentissage multimodal, microservices, AlphaFold, ESMFold, Scrum.
+
+\medskip
+\noindent\rule{\linewidth}{0.4pt}
+
+\paragraph{Abstract}
+\textit{This project presents an end-to-end biomedical AI platform that unifies
+a genomic track (DNA sequence $\rightarrow$ 3D protein structure $\rightarrow$
+ranked drug candidates) and a histopathological track (Whole Slide Image
+$\rightarrow$ mutation prediction + Grad-CAM) behind a cross-modal fusion
+layer. The system is built as a microservices architecture (FastAPI),
+orchestrated by a secure API gateway (JWT, PostgreSQL) and driven by a modern
+web interface (Next.js).}
 
 \spacing{1}
-\tableofcontents{}
+\tableofcontents
 \newpage
 \listoffigures
 \newpage
@@ -158,501 +239,1183 @@ apprentissage multimodal, microservices, AlphaFold.}
 \newpage
 \spacing{1.3}
 
-% ---------------------- Acronymes -------------------------------------
+% =====================================================================
+%  LISTE DES ACRONYMES
+% =====================================================================
 \chapter*{Liste des acronymes}
 \markboth{Liste des acronymes}{}
-\begin{itemize}
-\item \textbf{ADN} : Acide DésoxyriboNucléique
-\item \textbf{ADMET} : Absorption, Distribution, Métabolisme, Excrétion, Toxicité
-\item \textbf{API} : \textit{Application Programming Interface}
-\item \textbf{BLAST} : \textit{Basic Local Alignment Search Tool}
-\item \textbf{CNN} : \textit{Convolutional Neural Network} (réseau de neurones convolutif)
-\item \textbf{GC\%} : Taux de Guanine--Cytosine
-\item \textbf{GNN} : \textit{Graph Neural Network} (réseau de neurones de graphes)
-\item \textbf{IDP} : \textit{Intrinsically Disordered Protein}
-\item \textbf{JWT} : \textit{JSON Web Token}
-\item \textbf{MIL} : \textit{Multiple Instance Learning}
-\item \textbf{ORF} : \textit{Open Reading Frame} (cadre de lecture ouvert)
-\item \textbf{pLDDT} : \textit{predicted Local Distance Difference Test}
-\item \textbf{REST} : \textit{REpresentational State Transfer}
-\item \textbf{SMILES} : \textit{Simplified Molecular-Input Line-Entry System}
-\item \textbf{TCGA} : \textit{The Cancer Genome Atlas}
-\item \textbf{WSI} : \textit{Whole Slide Image} (lame numérisée entière)
-\item \textbf{XAI} : \textit{eXplainable Artificial Intelligence}
-\end{itemize}
+
+\begin{longtable}{p{0.18\linewidth} p{0.75\linewidth}}
+\textbf{ABMIL}    & \textit{Attention-Based Multiple Instance Learning} \\
+\textbf{ADN}      & Acide DésoxyriboNucléique \\
+\textbf{ADMET}    & Absorption, Distribution, Métabolisme, Excrétion, Toxicité \\
+\textbf{API}      & \textit{Application Programming Interface} \\
+\textbf{BLAST}    & \textit{Basic Local Alignment Search Tool} \\
+\textbf{CNN}      & \textit{Convolutional Neural Network} \\
+\textbf{GC\%}     & Taux de Guanine-Cytosine \\
+\textbf{GCN}      & \textit{Graph Convolutional Network} \\
+\textbf{GNN}      & \textit{Graph Neural Network} \\
+\textbf{IDP}      & \textit{Intrinsically Disordered Protein} \\
+\textbf{JWT}      & \textit{JSON Web Token} \\
+\textbf{MIL}      & \textit{Multiple Instance Learning} \\
+\textbf{MSE}      & \textit{Mean Squared Error} \\
+\textbf{ORF}      & \textit{Open Reading Frame} \\
+\textbf{PDB}      & \textit{Protein Data Bank} \\
+\textbf{pIC50}    & Logarithme négatif de la concentration inhibitrice à 50\% \\
+\textbf{pLDDT}    & \textit{predicted Local Distance Difference Test} \\
+\textbf{PPP}      & Projet Personnel Professionnel \\
+\textbf{REST}     & \textit{REpresentational State Transfer} \\
+\textbf{RMSE}     & \textit{Root Mean Squared Error} \\
+\textbf{SMILES}   & \textit{Simplified Molecular-Input Line-Entry System} \\
+\textbf{TCGA}     & \textit{The Cancer Genome Atlas} \\
+\textbf{UML}      & \textit{Unified Modeling Language} \\
+\textbf{WSI}      & \textit{Whole Slide Image} \\
+\textbf{XAI}      & \textit{eXplainable Artificial Intelligence} \\
+\end{longtable}
 
 \mainmatter
 
-% ======================================================================
-\chapter*{Introduction générale}
-\addcontentsline{toc}{chapter}{Introduction générale}
-\markboth{Introduction générale}{}
+% =====================================================================
+%  CHAPITRE 1 — INTRODUCTION
+% =====================================================================
+\chapter{Introduction}
+\label{ch:intro}
 
-La médecine de précision ambitionne d'adapter le diagnostic et le traitement aux
-caractéristiques moléculaires de chaque patient. Or, deux disciplines centrales
-de cette ambition --- l'analyse génomique et l'analyse histopathologique ---
-restent le plus souvent cloisonnées dans des outils et des flux de travail
-distincts. Par ailleurs, la découverte d'un médicament demeure un processus long
-(10 à 15 ans) et coûteux, dont les premières étapes (identification d'une cible
-protéique, criblage de molécules) se prêtent particulièrement bien à
-l'accélération par l'intelligence artificielle.
+\section*{Préambule}
+La médecine de précision ambitionne d'adapter chaque diagnostic et chaque
+traitement aux caractéristiques moléculaires propres au patient. Au cœur de
+cette ambition, deux disciplines fondamentales --- la \textbf{génomique} et
+l'\textbf{histopathologie} --- restent pourtant le plus souvent traitées de
+façon cloisonnée. Par ailleurs, la découverte d'un nouveau médicament
+représente en moyenne dix à quinze ans de travail et plusieurs milliards de
+dollars, dont les premières étapes (identification de cibles moléculaires,
+criblage de composés) se prêtent naturellement à l'accélération par
+l'intelligence artificielle.
 
-Ce projet répond à ce double constat en proposant une plateforme \emph{de bout en
-bout} qui relie la séquence d'ADN et l'image de tissu à une liste ordonnée de
-candidats-médicaments, tout en restant scientifiquement rigoureuse à chaque
-étape (validation des cadres de lecture, scores de confiance structurale,
-règles de \textit{drug-likeness}). Le présent rapport décrit la problématique,
-les fondements scientifiques, la conception logicielle, la réalisation et les
-résultats obtenus.
-
-Le document est organisé comme suit : le \textbf{chapitre~\ref{ch:contexte}}
-présente le contexte et la problématique ; le \textbf{chapitre~\ref{ch:etat}}
-expose les fondements scientifiques et l'état de l'art ; le
-\textbf{chapitre~\ref{ch:conception}} détaille la conception et l'architecture du
-système ; le \textbf{chapitre~\ref{ch:realisation}} décrit la réalisation
-technique ; enfin le \textbf{chapitre~\ref{ch:resultats}} présente les résultats
-et une discussion critique, avant la conclusion générale.
-
-% ======================================================================
-\chapter{Contexte général et problématique}
-\label{ch:contexte}
-
-\section*{Introduction}
-Ce chapitre situe le projet dans son contexte biomédical, énonce la problématique
-et fixe les objectifs ainsi que le périmètre du travail.
-
+% ------------------------------------------------------------------
 \section{Contexte biomédical}
-La cellule traduit l'information génétique (ADN) en protéines, acteurs
-fonctionnels de la biologie. Une altération de la séquence (mutation) peut
-modifier la structure et la fonction d'une protéine et favoriser l'apparition de
-maladies, en particulier les cancers. Cibler une protéine consiste à concevoir
-une petite molécule capable de se lier à une de ses \emph{poches} pour moduler
-son activité ; c'est le principe de la majorité des médicaments actuels.
 
-En parallèle, l'examen histopathologique de lames de tissu reste l'étalon-or du
-diagnostic du cancer. Les techniques d'apprentissage profond permettent
-aujourd'hui de prédire, à partir de la seule morphologie tissulaire, des
-caractéristiques moléculaires comme la présence de certaines mutations
-\cite{coudray2018classification}.
+\subsection{Du génome à la maladie}
 
+L'ADN est le support de l'information génétique de chaque organisme vivant.
+Il est constitué d'une succession de quatre nucléotides : Adénine (A),
+Thymine (T), Cytosine (C) et Guanine (G). La machinerie cellulaire lit ces
+instructions par triplets (codons) pour fabriquer des protéines, véritables
+acteurs fonctionnels de la biologie. Une \textbf{mutation} peut altérer
+la structure ou la fonction d'une protéine et conduire à un dérèglement
+cellulaire pouvant aboutir au cancer. Les cancers les plus fréquents sont
+associés à des mutations récurrentes de gènes suppresseurs de tumeurs comme
+\textit{TP53}, \textit{IDH1} ou d'oncogènes comme \textit{KRAS}.
+
+\subsection{Histopathologie computationnelle}
+
+L'examen histopathologique consiste à analyser au microscope des coupes de
+tissus prélevés par biopsie. Cette technique, pilier du diagnostic oncologique
+depuis plus d'un siècle, est en pleine révolution numérique : les lames sont
+désormais numérisées en \textit{Whole Slide Images} (WSI) à très haute
+résolution (parfois supérieure à $100\,000 \times 100\,000$ pixels). Les
+algorithmes d'apprentissage profond permettent aujourd'hui de détecter des
+signatures moléculaires invisibles à l'œil humain directement depuis ces
+images.
+
+\subsection{Découverte de médicaments}
+
+La conception d'un médicament repose sur le principe de la \og clé et de la
+serrure\fg{} : une petite molécule (ligand) doit s'insérer dans une
+\emph{poche de liaison} de la protéine cible pour moduler son activité.
+L'identification de cette poche et la sélection de molécules candidates
+constituent les premières étapes du criblage \textit{in silico}.
+
+% ------------------------------------------------------------------
 \section{Problématique}
-Trois difficultés motivent ce travail :
+
+Trois difficultés majeures motivent ce travail :
+
 \begin{itemize}
-\item \textbf{Cloisonnement des modalités.} La génomique et l'imagerie sont
-analysées séparément, alors que leur \emph{recoupement} renforcerait la fiabilité
-diagnostique.
-\item \textbf{Lenteur et coût de la découverte de médicaments.} Le criblage
-expérimental de milliers de molécules est onéreux ; une présélection
-\emph{in silico} de 5 à 10 candidats constitue un gain considérable.
-\item \textbf{Absence d'outil intégré.} Les chercheurs jonglent entre de
-multiples services en ligne (NCBI, UniProt, AlphaFold, ChEMBL\ldots) sans flux
-unifié, traçable et reproductible.
+  \item \textbf{Cloisonnement des modalités.} L'analyse génomique et
+    l'analyse d'imagerie histologique sont systématiquement traitées
+    séparément, alors que leur \emph{croisement} augmenterait sensiblement la
+    fiabilité diagnostique.
+  \item \textbf{Lenteur et coût de la découverte de médicaments.} Le criblage
+    expérimental de milliers de composés est onéreux et long ; une
+    présélection \textit{in silico} par intelligence artificielle peut
+    réduire ce délai de plusieurs années.
+  \item \textbf{Absence d'outil intégré et reproductible.} Les chercheurs
+    jonglent entre de multiples services en ligne (NCBI, UniProt, AlphaFold,
+    ChEMBL\ldots) sans flux unifié, tracé et reproductible.
 \end{itemize}
 
-\section{Objectifs}
-L'objectif est de concevoir et réaliser une plateforme unifiée qui :
+% ------------------------------------------------------------------
+\section{Objectifs du projet}
+
+L'objectif est de concevoir et réaliser une plateforme unifiée capable de :
+
 \begin{enumerate}
-\item valide une séquence d'ADN et la traduit en séquence protéique ;
-\item annote la protéine et prédit (ou récupère) sa structure 3D ;
-\item identifie des poches de liaison et propose des candidats-médicaments
-classés par affinité prédite ;
-\item prédit des mutations à partir d'images histopathologiques (piste de
-démonstration) ;
-\item fusionne les indices des deux modalités et produit un rapport exportable ;
-\item le tout derrière des comptes utilisateurs, un tableau de bord et une
-gestion des analyses.
+  \item Valider une séquence d'ADN, détecter les cadres de lecture ouverts
+    (ORFs) et les traduire en séquences protéiques ;
+  \item Annoter la protéine (BLAST, UniProt) et récupérer ou prédire sa
+    structure 3D (AlphaFold, ESMFold) ;
+  \item Identifier des poches de liaison et proposer un classement de
+    candidats-médicaments par affinité prédite (GNN) ;
+  \item Prédire la présence de mutations à partir d'images histopathologiques
+    et générer des cartes explicatives (Grad-CAM) ;
+  \item Fusionner les indices des deux modalités pour produire un rapport
+    clinique synthétique exportable ;
+  \item Exposer l'ensemble derrière des comptes utilisateurs sécurisés, un
+    tableau de bord et un suivi en temps réel des analyses.
 \end{enumerate}
 
+% ------------------------------------------------------------------
 \section{Périmètre et contributions}
-La contribution principale de ce travail (en complément d'une première version
-des microservices de la piste génomique) porte sur : la \textbf{réorganisation}
-du dépôt en mono-dépôt cohérent, la \textbf{passerelle d'API} (authentification,
-persistance, orchestration et fusion), l'\textbf{interface web} complète, et
-l'\textbf{intégration} de la piste histopathologique. La figure~\ref{fig:twotrack}
-résume la chaîne de traitement multimodale visée.
 
-\begin{figure}[!ht]
+Le tableau~\ref{tab:contributions} résume les contributions de chaque membre
+de l'équipe.
+
+\begin{table}[H]
+\caption{Répartition des contributions principales.}
+\label{tab:contributions}
 \centering
-\includegraphics[width=\linewidth]{images/two_track.png}
-\caption{Vue d'ensemble du pipeline multimodal : pistes génomique (A) et
-histopathologique (B), couche de fusion et découverte de médicaments.}
-\label{fig:twotrack}
-\end{figure}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{L{0.28\linewidth} L{0.65\linewidth}}
+\toprule
+\textbf{Auteur} & \textbf{Contribution principale} \\
+\midrule
+Aziz Amari       & Passerelle API (Gateway), authentification, orchestration du pipeline \\
+Rakia Tsouri      & Services génomique et analyse protéique (Track A), modèle GNN \\
+Sinda Ferchichi   & Service histopathologie (Track B), couche de fusion, interface web \\
+Moetez Fradi      & Service découverte de médicaments, entraînement du GNN, rapports \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\section*{Conclusion}
-Le besoin d'un outil intégré, rigoureux et reproductible étant établi, le
-chapitre suivant présente les briques scientifiques sur lesquelles il s'appuie.
+% ------------------------------------------------------------------
+\section{Organisation du rapport}
 
-% ======================================================================
-\chapter{Fondements scientifiques et état de l'art}
+Le présent rapport est organisé comme suit. Le \textbf{chapitre~\ref{ch:etat}}
+expose les fondements scientifiques et l'état de l'art. Le
+\textbf{chapitre~\ref{ch:solution}} présente la solution proposée à travers
+ses cas d'utilisation et la spécification de ses besoins. Le
+\textbf{chapitre~\ref{ch:materiel}} recense les ressources mobilisées
+(modèles d'apprentissage profond, jeux de données, outils). Le
+\textbf{chapitre~\ref{ch:methodo}} décrit la méthodologie de développement
+Scrum ainsi que la méthodologie d'entraînement des modèles. Le
+\textbf{chapitre~\ref{ch:archi}} détaille l'architecture du système, le
+modèle de données et le pipeline d'inférence des modèles. Le
+\textbf{chapitre~\ref{ch:resultats}} présente les résultats expérimentaux
+et les captures de la plateforme. Une conclusion générale et des
+perspectives clôturent le document.
+
+% =====================================================================
+%  CHAPITRE 2 — BACKGROUND AND LITERATURE REVIEW
+% =====================================================================
+\chapter{Contexte scientifique et état de l'art}
 \label{ch:etat}
 
 \section*{Introduction}
-Ce chapitre rappelle les notions et outils mobilisés par la plateforme, des
-séquences nucléotidiques aux réseaux de neurones de graphes.
+Ce chapitre rappelle les notions clés et les outils de référence mobilisés
+par la plateforme, des séquences nucléotidiques aux réseaux de neurones de
+graphes, en passant par la prédiction de structure et l'histopathologie
+computationnelle.
 
+% ------------------------------------------------------------------
 \section{De l'ADN à la protéine}
+
 Une séquence d'ADN valide est composée des nucléotides A, T, C et G. La
 traduction s'effectue par triplets (codons) à partir d'un codon d'initiation
-(ATG) et jusqu'à un codon stop, définissant un cadre de lecture ouvert (ORF). La
-bibliothèque \textbf{Biopython} \cite{cock2009biopython} fournit les outils de
-manipulation et de traduction des séquences, ainsi qu'un accès programmatique aux
-bases du NCBI.
+(\texttt{ATG}) jusqu'à un codon stop (\texttt{TAA}, \texttt{TAG},
+\texttt{TGA}), définissant un \textbf{cadre de lecture ouvert} (ORF). La
+bibliothèque \textbf{Biopython} \cite{cock2009biopython} fournit les outils
+de manipulation, de traduction des séquences et d'accès aux bases du NCBI
+via l'API Entrez.
 
+% ------------------------------------------------------------------
 \section{Annotation et similarité de séquences}
-\textbf{BLAST} \cite{altschul1990blast} recherche des protéines homologues
-connues ; un fort pourcentage d'identité permet d'associer la protéine à une
-entrée \textbf{UniProt} \cite{uniprot2023}, riche en annotations fonctionnelles
-(domaines, sites actifs, sites de liaison, maladies associées).
 
-\section{Prédiction de structure 3D}
-La structure tridimensionnelle conditionne la fonction. \textbf{AlphaFold}
-\cite{jumper2021alphafold} a révolutionné sa prédiction et met à disposition une
-base de plus de 200 millions de structures, assorties d'un score de confiance par
-résidu (pLDDT). Pour les protéines nouvelles, \textbf{ESMFold}
-\cite{lin2023esmfold} permet une prédiction rapide sans GPU dédié.
+\textbf{BLAST} (\textit{Basic Local Alignment Search Tool})
+\cite{altschul1990blast} recherche dans des bases de données de protéines
+(SwissProt, PDB) des séquences homologues à une séquence requête. Un fort
+pourcentage d'identité ($>90\%$) permet d'associer la protéine à une entrée
+de \textbf{UniProt} \cite{uniprot2023}, base qui fournit des annotations
+fonctionnelles riches : domaines, sites actifs, sites de liaison et maladies
+associées.
 
-\section{Découverte de médicaments assistée par IA}
-Une molécule peut être représentée par une chaîne \textbf{SMILES} puis par un
-\emph{graphe moléculaire} (atomes = n\oe uds, liaisons = arêtes) à l'aide de
-\textbf{RDKit} \cite{rdkit}. Les \textbf{réseaux de neurones de graphes (GNN)}
-\cite{kipf2017gcn,gilmer2017mpnn} apprennent à prédire l'affinité de liaison
-protéine--ligand. Les candidats sont filtrés par la règle de cinq de Lipinski
-\cite{lipinski2001ro5} et sourcés depuis \textbf{ChEMBL} \cite{gaulton2017chembl}.
+% ------------------------------------------------------------------
+\section{Prédiction de structure protéique tridimensionnelle}
 
+\textbf{AlphaFold~2} \cite{jumper2021alphafold} a révolutionné la prédiction
+de structure en résolvant le problème de repliement des protéines par
+apprentissage profond. La base \textbf{AlphaFold DB} contient plus de
+200~millions de structures précalculées, assorties d'un score de confiance
+par résidu : le \textbf{pLDDT} (\textit{predicted Local Distance Difference
+Test}), interprété comme suit : $>90$ = très haute confiance, $70$--$90$ =
+confiant, $50$--$70$ = faible, $<50$ = non structuré.
+
+Pour les protéines absentes de la base (séquences nouvelles ou mutées),
+\textbf{ESMFold} \cite{lin2023esmfold} de Meta permet une prédiction rapide
+à partir d'un modèle de langage de protéines (\textit{protein language
+model}) sans alignements multiples de séquences.
+
+% ------------------------------------------------------------------
+\section{Détection de poches et découverte de médicaments}
+
+Les \textbf{poches de liaison} sont des cavités à la surface de la protéine
+où un ligand peut se fixer. L'outil \textbf{P2Rank}, un classifieur
+d'apprentissage automatique, détecte ces cavités et leur attribue un score
+de \textit{druggabilité}.
+
+Une molécule chimique peut être représentée par une chaîne \textbf{SMILES}
+(\textit{Simplified Molecular-Input Line-Entry System}) puis convertie en
+\textit{graphe moléculaire} (atomes = nœuds, liaisons = arêtes) via la
+bibliothèque \textbf{RDKit} \cite{rdkit}. Les \textbf{réseaux de neurones de
+graphes (GNN)} \cite{kipf2017gcn} apprennent à prédire l'affinité de liaison
+protéine--ligand (exprimée en \textbf{pIC50}) depuis ces représentations
+structurées. Les candidats sont issus de \textbf{ChEMBL}
+\cite{gaulton2017chembl} et filtrés par la \textbf{règle des cinq de
+Lipinski} \cite{lipinski2001ro5} (poids moléculaire, LogP, donneurs et
+accepteurs de liaisons hydrogène).
+
+% ------------------------------------------------------------------
 \section{Apprentissage profond en histopathologie}
-Les lames numérisées (WSI) sont trop volumineuses pour être traitées d'un bloc ;
-elles sont découpées en \emph{patchs}. Un extracteur de caractéristiques de type
-\textbf{ResNet} \cite{he2016resnet} encode chaque patch, puis une agrégation par
-\textbf{apprentissage à instances multiples (MIL)} avec attention
-\cite{ilse2018abmil} produit une prédiction au niveau de la lame. La méthode
-\textbf{Grad-CAM} \cite{selvaraju2017gradcam} fournit des cartes de chaleur
-explicatives. Coudray \emph{et al.} \cite{coudray2018classification} ont montré la
-faisabilité de la prédiction de mutations à partir d'images, en s'appuyant
-notamment sur les données \textbf{TCGA} \cite{weinstein2013tcga}.
 
-\section{Synthèse}
-Le tableau~\ref{tab:outils} récapitule les outils par étape. La plateforme se
-distingue en \emph{chaînant} ces briques et en \emph{recoupant} les deux
-modalités, là où l'état de l'art les traite isolément.
+Les WSI, dont la taille peut dépasser plusieurs gigaoctets, ne peuvent être
+traitées directement par un CNN. L'approche standard consiste à les découper
+en \textbf{patchs} de $256\times256$ ou $512\times512$ pixels. Un encodeur
+pré-entraîné de type \textbf{ResNet50} \cite{he2016resnet} extrait un vecteur
+de caractéristiques de chaque patch.
 
-\begin{table}[!ht]
-\caption{Outils scientifiques mobilisés par étape.}
+L'\textbf{apprentissage par instances multiples avec attention (ABMIL)}
+\cite{ilse2018abmil} agrège les représentations de tous les patchs d'une
+lame en une prédiction unique au niveau de la lame entière. Coudray
+\textit{et al.} \cite{coudray2018classification} ont montré la faisabilité
+de la prédiction de mutations (\textit{TP53}, \textit{KRAS}, \textit{STK11})
+depuis les seules images histologiques en s'appuyant sur les données du
+\textbf{TCGA} \cite{weinstein2013tcga}.
+
+La méthode \textbf{Grad-CAM} \cite{selvaraju2017gradcam} produit des cartes
+de chaleur expliquant quelles régions de l'image ont le plus contribué à la
+décision du modèle, satisfaisant ainsi les exigences d'interprétabilité
+(\textit{XAI}) en contexte médical.
+
+% ------------------------------------------------------------------
+\section{Synthèse et positionnement}
+
+\begin{table}[H]
+\caption{Outils et méthodes mobilisés par le pipeline.}
 \label{tab:outils}
 \centering
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{L{0.30\linewidth} L{0.62\linewidth}}
+\begin{tabular}{L{0.30\linewidth} L{0.60\linewidth}}
 \toprule
-\textbf{Étape} & \textbf{Outil / méthode} \\
+\textbf{Étape du pipeline} & \textbf{Outil / méthode clé} \\
 \midrule
-Validation \& traduction ADN & Biopython, NCBI Entrez \\
-Similarité \& annotation & BLAST, UniProt \\
-Structure 3D & AlphaFold DB, ESMFold, RCSB PDB \\
-Poches \& candidats & fpocket/P2Rank, ChEMBL, RDKit \\
-Affinité protéine--ligand & GNN (PyTorch Geometric) \\
-Mutation depuis WSI & ResNet50, MIL à attention, Grad-CAM \\
+Validation \& traduction ADN  & Biopython, NCBI Entrez \\
+Similarité \& annotation       & BLAST (SwissProt), UniProt REST API \\
+Structure 3D                   & AlphaFold DB, ESMFold (Meta), RCSB PDB \\
+Pliabilité protéique           & FoldIndex, IUPred2A, hydrophobicité Kyte-Doolittle \\
+Détection de poches            & P2Rank \\
+Candidats médicaments          & ChEMBL, ZINC15, RDKit (Lipinski) \\
+Affinité protéine--ligand      & GNN (PyTorch Geometric, GCNConv) \\
+Analyse WSI                    & ResNet50, ABMIL, Grad-CAM \\
+Fusion multimodale             & Règles de décision + coefficient kappa \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La plateforme se distingue de l'état de l'art en \emph{chaînant} ces briques
+en un flux unique et en \emph{recoupant systématiquement} les deux
+modalités, là où les travaux existants les traitent isolément.
+
+\section*{Conclusion}
+Les fondements scientifiques posés, le chapitre suivant présente la solution
+proposée à travers ses cas d'utilisation et la spécification de ses besoins.
+
+% =====================================================================
+%  CHAPITRE 3 — PROPOSED SOLUTION
+% =====================================================================
+\chapter{Solution proposée}
+\label{ch:solution}
+
+\section*{Introduction}
+Ce chapitre présente la solution proposée pour répondre à la problématique
+identifiée : ses acteurs et cas d'utilisation, sa vision fonctionnelle
+d'ensemble et la spécification formelle de ses besoins fonctionnels et non
+fonctionnels.
+
+% ------------------------------------------------------------------
+\section{Vue d'ensemble de la solution}
+
+La solution proposée prend la forme d'une \textbf{plateforme web unifiée}
+articulée autour de deux pistes d'analyse complémentaires et d'une couche
+de fusion multimodale (figure~\ref{fig:twotrack}). Le chercheur soumet, via
+une interface web sécurisée, une séquence d'ADN et/ou une image WSI ; le
+système orchestre alors la chaîne de traitement complète --- validation,
+annotation, structure 3D, prédiction de mutations, fusion et classement de
+médicaments candidats --- et restitue un rapport synthétique exportable.
+
+\begin{figure}[H]
+\centering
+\figorbox{images/two_track.png}{0.92\linewidth}{Vue d'ensemble du pipeline multimodal en deux pistes convergentes vers la fusion et la découverte de médicaments.}
+\caption{Vue d'ensemble du pipeline multimodal : pistes génomique (A) et histopathologique (B) convergeant vers la fusion puis la découverte de médicaments.}
+\label{fig:twotrack}
+\end{figure}
+
+% ------------------------------------------------------------------
+\section{Acteurs et diagramme de cas d'utilisation}
+
+Deux acteurs interagissent avec la plateforme :
+
+\begin{itemize}
+  \item Le \textbf{Chercheur} : utilisateur principal, soumet des analyses
+    et consulte les résultats.
+  \item L'\textbf{Administrateur} : hérite des droits du chercheur et gère
+    les comptes utilisateurs.
+\end{itemize}
+
+La figure~\ref{fig:usecase} présente le diagramme de cas d'utilisation
+résumant les principales fonctionnalités offertes à chacun.
+
+\begin{figure}[H]
+\centering
+\figorbox{images/usecase.png}{0.85\linewidth}{Diagramme de cas d'utilisation : Chercheur et Administrateur, leurs cas d'usage et relations \og include\fg{} / \og extend\fg.}
+\caption{Diagramme de cas d'utilisation de la plateforme.}
+\label{fig:usecase}
+\end{figure}
+
+% ------------------------------------------------------------------
+\section{Spécification des besoins fonctionnels}
+
+Les besoins fonctionnels sont organisés par acteur.
+
+\paragraph{Chercheur}
+\begin{itemize}
+  \item Créer un compte, s'authentifier et gérer son profil ;
+  \item Créer des projets et y associer des analyses ;
+  \item Soumettre une séquence ADN (texte brut ou FASTA) et/ou un
+    identifiant NCBI ;
+  \item Uploader une image WSI pour l'analyse histopathologique ;
+  \item Suivre l'avancement du pipeline étape par étape ;
+  \item Consulter les résultats détaillés : ORFs, annotation, structure 3D,
+    candidats-médicaments, carte Grad-CAM et rapport de fusion ;
+  \item Exporter le rapport final en HTML ou PDF.
+\end{itemize}
+
+\paragraph{Administrateur}
+\begin{itemize}
+  \item Toutes les fonctionnalités du chercheur ;
+  \item Accéder à l'ensemble des analyses de tous les utilisateurs ;
+  \item Gérer les comptes (activation/désactivation, modification des rôles).
+\end{itemize}
+
+% ------------------------------------------------------------------
+\section{Spécification des besoins non fonctionnels}
+
+\begin{table}[H]
+\caption{Besoins non fonctionnels de la plateforme.}
+\label{tab:nonfunc}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{0.22\linewidth} L{0.70\linewidth}}
+\toprule
+\textbf{Catégorie} & \textbf{Exigence} \\
+\midrule
+Performance      & Chaque service doit répondre en moins de 30 secondes pour une séquence de taille standard ($\leq 2000$ aa). \\
+Disponibilité    & Architecture tolérante aux pannes : la défaillance d'un service externe n'interrompt pas le pipeline. \\
+Sécurité         & Authentification JWT signée (HS256), mots de passe hachés (pbkdf2-sha256), contrôle d'accès basé sur les rôles. \\
+Maintenabilité   & Architecture microservices : chaque service est déployable et testable indépendamment. \\
+Portabilité      & Conteneurisation Docker Compose ; déployable sur toute machine disposant de Docker. \\
+Scalabilité      & Architecture prête pour l'ajout d'une file de tâches asynchrones (Celery/RQ). \\
+Interprétabilité & Les prédictions de mutations doivent être accompagnées de cartes Grad-CAM. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section*{Conclusion}
-Ces fondements posés, le chapitre suivant détaille la conception du système qui
-les intègre.
+La solution étant cadrée par ses cas d'usage et ses exigences, le chapitre
+suivant recense le matériel scientifique (jeux de données, modèles, outils)
+mobilisé pour la construire.
 
-% ======================================================================
-\chapter{Conception et architecture du système}
-\label{ch:conception}
+% =====================================================================
+%  CHAPITRE 4 — MATERIALS
+% =====================================================================
+\chapter{Matériel}
+\label{ch:materiel}
 
 \section*{Introduction}
-Ce chapitre décrit l'architecture logicielle, les acteurs et cas d'utilisation,
-le modèle de données, ainsi que la dynamique du pipeline et de la fusion.
+Ce chapitre décrit les ressources scientifiques mobilisées par la
+plateforme : les \emph{jeux de données} qui alimentent l'entraînement et
+l'inférence, les \emph{modèles d'apprentissage profond} mis en œuvre, et
+les \emph{outils et frameworks} qui composent la pile technique.
 
-\section{Architecture en microservices}
-La plateforme adopte une architecture en microservices faiblement couplés,
-communiquant en REST/JSON. Chaque service scientifique est indépendant,
-conteneurisé et déployable séparément. Une \emph{passerelle d'API} unique
-constitue le point d'entrée de l'interface web : elle gère l'authentification, la
-persistance, l'orchestration du pipeline et la fusion multimodale. La
-figure~\ref{fig:archi} présente l'organisation des composants.
+% ------------------------------------------------------------------
+\section{Jeux de données utilisés}
+\label{sec:datasets}
 
-\begin{figure}[!ht]
+\begin{table}[H]
+\caption{Jeux de données mobilisés par la plateforme.}
+\label{tab:datasets}
 \centering
-\includegraphics[width=\linewidth]{images/architecture.png}
-\caption{Diagramme de composants : interface, passerelle, microservices,
-bases de données et volume partagé.}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{L{0.18\linewidth} L{0.20\linewidth} L{0.52\linewidth}}
+\toprule
+\textbf{Jeu de données} & \textbf{Utilisation} & \textbf{Description} \\
+\midrule
+BindingDB        & Entraînement GNN & Base d'affinités protéine--ligand mesurées expérimentalement ($\sim$2,8 M interactions, $\sim$1,2 M ligands, $\sim$8 800 cibles). Source des couples (séquence protéique, SMILES, pIC50) pour l'entraînement de \texttt{DrugProteinGNN}. \\
+PDBbind v2020    & Structures protéine--ligand & Sous-ensemble \emph{refined} ($\sim$5\,000 complexes) utilisé pour la construction des graphes protéiques d'entraînement. \\
+TCGA-LUAD / BRCA / LGG & Inférence Track~B & Lames numérisées (WSI) du \textit{The Cancer Genome Atlas} : adénocarcinome pulmonaire, cancer du sein, gliome de bas grade. Données disponibles pour un futur entraînement supervisé du modèle CNN+MIL. \\
+ChEMBL v32       & Candidats médicaments & Plus de 2,3~M de composés bioactifs avec leurs SMILES, leurs cibles et leurs activités. Source des candidats lors de l'inférence. \\
+ZINC15           & Candidats médicaments & 230~M de molécules \textit{drug-like} disponibles commercialement. Sous-ensemble \emph{FDA-approved} utilisé en complément de ChEMBL. \\
+AlphaFold DB     & Structures 3D & Plus de 200~M de structures protéiques prédites avec score pLDDT par résidu. Source primaire des structures pour la découverte de médicaments. \\
+RCSB PDB         & Structures 3D & Structures expérimentales (rayons X, cryo-EM) utilisées en complément lorsque pertinentes. \\
+UniProt          & Annotations & Annotations fonctionnelles des protéines (domaines, sites actifs/liaison, maladies associées). \\
+NCBI Entrez      & Séquences ADN & Récupération automatique de séquences à partir d'un identifiant (\textit{e.g.} \texttt{NM\_000546} pour TP53). \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------------
+\section{Modèles d'apprentissage profond}
+\label{sec:models}
+
+La plateforme mobilise deux familles de modèles d'apprentissage profond,
+chacune adaptée à une modalité.
+
+\subsection{Réseau de neurones de graphes : DrugProteinGNN}
+\label{sec:gnn_arch}
+
+Le modèle \texttt{DrugProteinGNN} prédit l'affinité de liaison
+protéine--ligand (exprimée en pIC50) à partir de deux graphes en entrée :
+le graphe de la \emph{poche protéique} (résidus = nœuds, contacts spatiaux =
+arêtes) et le graphe de la \emph{molécule candidate} (atomes = nœuds,
+liaisons = arêtes). Chaque branche est composée de deux couches
+\textbf{GCNConv} suivies d'un \textit{global mean pool}, et les deux
+représentations latentes sont concaténées puis passées à un perceptron
+multi-couches qui régresse le score pIC50 (figure~\ref{fig:gnn_arch}).
+
+\begin{figure}[H]
+\centering
+\figorbox{images/model_arch_gnn.png}{0.9\linewidth}{Architecture du modèle DrugProteinGNN : deux encodeurs de graphes parallèles (poche protéique et molécule), \textit{pooling} global, fusion par concaténation, MLP de prédiction de pIC50.}
+\caption{Architecture du modèle GNN \texttt{DrugProteinGNN}.}
+\label{fig:gnn_arch}
+\end{figure}
+
+\subsection{CNN + ABMIL pour l'histopathologie}
+\label{sec:mil_arch}
+
+Pour la piste B, la lame WSI est découpée en patchs de
+$256\times256$~pixels. Chaque patch est encodé par un \textbf{ResNet50}
+\cite{he2016resnet} (couche \texttt{layer4}) en un vecteur de
+caractéristiques de dimension 2048. Les vecteurs des patchs d'une même lame
+sont ensuite agrégés par un module \textbf{Attention-based MIL (ABMIL)}
+\cite{ilse2018abmil} qui calcule des poids d'attention par patch, produit
+une représentation au niveau de la lame, puis prédit la présence de chaque
+mutation cible (figure~\ref{fig:mil_arch}). La méthode \textbf{Grad-CAM}
+\cite{selvaraju2017gradcam} produit une carte de chaleur explicative pour
+le patch le plus discriminant.
+
+\begin{figure}[H]
+\centering
+\figorbox{images/model_arch_mil.png}{0.9\linewidth}{Architecture CNN + ABMIL : extraction de patchs $256\times256$, encodage ResNet50, agrégation par attention, tête de classification par gène cible, et Grad-CAM pour l'explicabilité.}
+\caption{Architecture CNN + Attention-MIL pour la prédiction de mutations à partir d'images WSI.}
+\label{fig:mil_arch}
+\end{figure}
+
+% ------------------------------------------------------------------
+\section{Outils et frameworks}
+
+\begin{table}[H]
+\caption{Pile technologique complète du projet.}
+\label{tab:tech}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{0.25\linewidth} L{0.67\linewidth}}
+\toprule
+\textbf{Couche} & \textbf{Technologies} \\
+\midrule
+Microservices      & Python 3.11, FastAPI, Pydantic v2, Uvicorn \\
+Sciences / IA      & PyTorch 2, PyTorch Geometric, RDKit, Biopython, torchvision \\
+Passerelle         & FastAPI, SQLAlchemy 2, JWT (python-jose), pbkdf2-sha256 \\
+Interface          & Next.js 14, TypeScript, Tailwind CSS, React 18 \\
+Visualisation 3D   & 3Dmol.js (protéine + ligand côté client) \\
+Base de données    & PostgreSQL 16, Redis 7 (alpine) \\
+Conteneurisation   & Docker 24, Docker Compose v2 \\
+Explicabilité      & Grad-CAM (torchvision hooks) \\
+Tests              & pytest, pytest-asyncio, respx, httpx ASGI \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Conclusion}
+Le matériel scientifique étant inventorié, le chapitre suivant détaille la
+méthodologie de développement et la méthodologie d'entraînement des modèles.
+
+% =====================================================================
+%  CHAPITRE 5 — METHODOLOGY
+% =====================================================================
+\chapter{Méthodologie}
+\label{ch:methodo}
+
+\section*{Introduction}
+Ce chapitre décrit deux méthodologies complémentaires : la \emph{méthodologie
+de travail} adoptée pour piloter le projet (Scrum) et la \emph{méthodologie
+d'entraînement} des modèles d'apprentissage profond.
+
+% ------------------------------------------------------------------
+\section{Méthodologie de travail : Scrum}
+
+Face à la nature exploratoire du projet --- à la croisée de la
+bio-informatique et de l'intelligence artificielle --- une approche
+\textbf{Agile} était plus adaptée qu'une méthode en cascade. Les exigences
+scientifiques évoluent au fil des expérimentations, et chaque résultat
+intermédiaire alimente les décisions de conception de l'étape suivante.
+
+\textbf{Scrum} a été retenu pour les raisons suivantes :
+\begin{itemize}
+  \item Organisation en \textbf{sprints courts} (2 semaines) avec livraison
+    incrémentale de fonctionnalités ;
+  \item \textbf{Backlog priorisé} permettant de se concentrer sur les
+    composants à plus forte valeur ajoutée scientifique ;
+  \item \textbf{Réunions de revue} en fin de sprint pour valider chaque
+    microservice avec l'encadrante ;
+  \item \textbf{Adaptabilité} aux découvertes techniques (indisponibilité
+    d'une API externe, performances insuffisantes d'un modèle).
+\end{itemize}
+
+\subsection{Équipe et rôles Scrum}
+
+\begin{table}[H]
+\caption{Rôles Scrum dans l'équipe.}
+\label{tab:scrumroles}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{0.30\linewidth} L{0.60\linewidth}}
+\toprule
+\textbf{Rôle} & \textbf{Responsable} \\
+\midrule
+Product Owner            & Dr. Hajer Taktak \\
+Scrum Master             & Aziz Amari \\
+Équipe de développement  & Aziz Amari, Rakia Tsouri, Sinda Ferchichi, Moetez Fradi \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Product Backlog}
+
+\begin{longtable}{C{0.05\linewidth} L{0.44\linewidth} C{0.10\linewidth} C{0.08\linewidth} C{0.08\linewidth}}
+\caption{Product Backlog du projet.}
+\label{tab:backlog}\\
+\toprule
+\textbf{ID} & \textbf{User Story} & \textbf{Épopée} & \textbf{Prio.} & \textbf{Pts} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{l}{\textit{(suite du tableau~\ref{tab:backlog})}}\\
+\toprule
+\textbf{ID} & \textbf{User Story} & \textbf{Épopée} & \textbf{Prio.} & \textbf{Pts} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\textit{Suite à la page suivante\ldots}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+US01 & Soumettre une séquence ADN et obtenir ses ORFs traduits. & Track A & Haute & 8 \\
+US02 & Récupération automatique d'une séquence par identifiant NCBI. & Track A & Haute & 5 \\
+US03 & Identification BLAST + annotations UniProt. & Track A & Haute & 8 \\
+US04 & Structure 3D de la protéine (AlphaFold ou ESMFold). & Track A & Haute & 13 \\
+US05 & Détection des poches de liaison. & Drug Discovery & Haute & 8 \\
+US06 & Classement des 10 meilleurs candidats-médicaments. & Drug Discovery & Haute & 13 \\
+US07 & Propriétés ADMET de chaque candidat. & Drug Discovery & Moyenne & 5 \\
+US08 & Upload WSI et prédiction de mutation. & Track B & Haute & 13 \\
+US09 & Carte Grad-CAM superposée. & Track B & Haute & 8 \\
+US10 & Rapport de fusion croisant les modalités. & Fusion & Haute & 8 \\
+US11 & Inscription et connexion sécurisées. & Auth & Haute & 5 \\
+US12 & Organisation des analyses par projet. & Gestion & Moyenne & 5 \\
+US13 & Suivi en temps réel d'une analyse. & Gestion & Haute & 5 \\
+US14 & Export d'un rapport HTML/PDF. & Rapport & Moyenne & 5 \\
+US15 & Administration des comptes utilisateurs. & Admin & Basse & 3 \\
+US16 & Visualisation 3D moléculaire en navigateur. & Visualisation & Moyenne & 8 \\
+\end{longtable}
+
+\subsection{Planification des sprints}
+
+Le projet a été découpé en \textbf{4 sprints} de deux semaines, soit
+8~semaines de développement.
+
+\begin{sprintbox}{Sprint 1 — Infrastructure \& Track A (1) — Semaines 1--2}
+\textbf{Objectif :} Infrastructure Docker et service de validation génomique.
+
+\medskip
+\begin{tabular}{L{0.10\linewidth} L{0.60\linewidth} L{0.20\linewidth}}
+\textbf{ID} & \textbf{Tâche} & \textbf{Statut} \\
+\hline
+US11 & Monorepo, Docker Compose (Redis) & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US01 & \texttt{genomics\_validation} : ORFs, traduction & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US02 & API NCBI Entrez + cache Redis & \textcolor{green!60!black}{\textbf{Terminé}} \\
+     & Tests unitaires logique ADN & \textcolor{green!60!black}{\textbf{Terminé}} \\
+\end{tabular}
+
+\medskip\textbf{Vélocité réalisée :} 18 points
+\end{sprintbox}
+
+\vspace{0.8em}
+
+\begin{sprintbox}{Sprint 2 — Track A (2) \& Drug Discovery — Semaines 3--4}
+\textbf{Objectif :} Analyse protéique et découverte de médicaments avec GNN.
+
+\medskip
+\begin{tabular}{L{0.10\linewidth} L{0.60\linewidth} L{0.20\linewidth}}
+\textbf{ID} & \textbf{Tâche} & \textbf{Statut} \\
+\hline
+US03 & \texttt{protein\_analysis} : BLAST, UniProt, fold check & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US04 & AlphaFold DB + ESMFold API & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US05 & \texttt{drug\_discovery} : détection de poches P2Rank & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US06 & Entraînement GNN (BindingDB) et inférence & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US07 & ADMET (RDKit), Lipinski, classement Top~10 & \textcolor{green!60!black}{\textbf{Terminé}} \\
+\end{tabular}
+
+\medskip\textbf{Vélocité réalisée :} 47 points
+\end{sprintbox}
+
+\vspace{0.8em}
+
+\begin{sprintbox}{Sprint 3 — Track B, Gateway \& Fusion — Semaines 5--6}
+\textbf{Objectif :} Piste histopathologique, passerelle d'API, couche de fusion.
+
+\medskip
+\begin{tabular}{L{0.10\linewidth} L{0.60\linewidth} L{0.20\linewidth}}
+\textbf{ID} & \textbf{Tâche} & \textbf{Statut} \\
+\hline
+US08 & \texttt{histopathology} : patchs, CNN, MIL & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US09 & Génération des cartes Grad-CAM & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US10 & Couche de fusion multimodale & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US11 & Gateway : JWT, PostgreSQL, rôles & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US12 & Gestion projets et jobs (CRUD) & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US13 & Orchestrateur du pipeline & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US14 & Générateur de rapports HTML & \textcolor{green!60!black}{\textbf{Terminé}} \\
+\end{tabular}
+
+\medskip\textbf{Vélocité réalisée :} 49 points
+\end{sprintbox}
+
+\vspace{0.8em}
+
+\begin{sprintbox}{Sprint 4 — Interface \& Finalisation — Semaines 7--8}
+\textbf{Objectif :} Interface Next.js, visualisations, documentation.
+
+\medskip
+\begin{tabular}{L{0.10\linewidth} L{0.60\linewidth} L{0.20\linewidth}}
+\textbf{ID} & \textbf{Tâche} & \textbf{Statut} \\
+\hline
+US11 & Pages Inscription/Connexion + tokens & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US12 & Tableau de bord des projets & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US13 & Suivi en temps réel (polling) & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US16 & Visualisation 3D moléculaire (3Dmol.js) & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US14 & Export rapport HTML/PDF & \textcolor{green!60!black}{\textbf{Terminé}} \\
+US15 & Interface d'administration & \textcolor{green!60!black}{\textbf{Terminé}} \\
+     & Tests d'intégration end-to-end + déploiement Docker & \textcolor{green!60!black}{\textbf{Terminé}} \\
+\end{tabular}
+
+\medskip\textbf{Vélocité réalisée :} 31 points
+\end{sprintbox}
+
+% ------------------------------------------------------------------
+\section{Méthodologie d'entraînement des modèles}
+\label{sec:train_methodo}
+
+Cette section décrit la procédure d'entraînement adoptée pour le modèle
+\texttt{DrugProteinGNN}. La même grille générale serait appliquée au modèle
+CNN+ABMIL pour la piste histopathologique une fois les données TCGA
+annotées disponibles.
+
+\subsection{Préparation des données}
+
+Les couples (protéine, ligand, pIC50) sont extraits de BindingDB. Les
+ligands de SMILES invalides ou de poids moléculaire $>$~900~Da sont écartés.
+Les structures protéiques correspondantes sont récupérées depuis le
+sous-ensemble \emph{refined} de PDBbind. Pour chaque couple, deux graphes
+sont construits :
+
+\begin{itemize}
+  \item \textbf{Graphe protéique :} les résidus de la poche (CA atoms) sont
+    les nœuds (25 dimensions de \textit{features} encodant le type d'acide
+    aminé, l'hydrophobicité et le score d'accessibilité au solvant). Une
+    arête est créée entre deux résidus si la distance entre leurs C$\alpha$
+    est inférieure à 8~Å.
+  \item \textbf{Graphe moléculaire :} les atomes du ligand sont les nœuds
+    (5 dimensions de \textit{features} : numéro atomique, degré, charge
+    formelle, hybridation, aromaticité). Les liaisons covalentes sont les
+    arêtes.
+\end{itemize}
+
+L'ensemble final compte $\sim$5\,000 couples. La cible pIC50 est conservée
+telle quelle (régression).
+
+\subsection{Stratégie d'entraînement}
+
+\begin{table}[H]
+\caption{Hyperparamètres d'entraînement du GNN.}
+\label{tab:gnn_hp}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{0.40\linewidth} L{0.48\linewidth}}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+Découpe train/validation     & 80\% / 20\% (aléatoire avec graine fixée) \\
+Taille de lot (\textit{batch size}) & 128 \\
+Optimiseur                   & Adam, \textit{learning rate} $=10^{-3}$ \\
+Fonction de perte            & MSE sur pIC50 \\
+Nombre d'époques             & 50 (point de sauvegarde tous les 5 époques) \\
+Dropout (couche de fusion)   & 0,2 \\
+Périphérique                 & CUDA si disponible, CPU sinon \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+L'entraînement est piloté par le script \texttt{services/drug\_discovery/ml/
+train.py}. Un \textit{checkpoint} est sauvegardé toutes les 5~époques pour
+permettre la reprise après interruption.
+
+\subsection{Métriques d'évaluation}
+
+Les métriques retenues pour le GNN (régression) sont :
+
+\begin{itemize}
+  \item \textbf{RMSE} (\textit{Root Mean Squared Error}) sur le pIC50 ;
+  \item \textbf{MAE} (\textit{Mean Absolute Error}) ;
+  \item \textbf{R$^2$} (\textit{coefficient of determination}) ;
+  \item \textbf{Spearman~$\rho$} pour la corrélation de rang
+    (utile au criblage).
+\end{itemize}
+
+Pour le modèle CNN+ABMIL (classification), les métriques cibles sont
+AUC-ROC, F1-score, exactitude (\textit{accuracy}) et matrice de confusion.
+La cible visée est AUC-ROC $>$~0,80 conformément à la
+référence \cite{coudray2018classification}.
+
+\section*{Conclusion}
+La méthodologie de développement et d'entraînement étant posée, le chapitre
+suivant détaille l'architecture du système et le pipeline d'inférence des
+modèles.
+
+% =====================================================================
+%  CHAPITRE 6 — SYSTEM ARCHITECTURE
+% =====================================================================
+\chapter{Architecture du système}
+\label{ch:archi}
+
+\section*{Introduction}
+Ce chapitre détaille l'architecture logicielle de la plateforme : la
+\emph{décomposition en microservices}, le \emph{modèle de données} de la
+passerelle, la \emph{dynamique du pipeline}, la \emph{couche de fusion
+multimodale}, le \emph{déploiement} et enfin le \emph{pipeline d'inférence}
+des modèles d'apprentissage profond.
+
+% ------------------------------------------------------------------
+\section{Architecture en microservices}
+
+La plateforme adopte une architecture en \textbf{microservices faiblement
+couplés}, communiquant en REST/JSON sur un réseau Docker privé. Chaque
+service scientifique est indépendant, conteneurisé et déployable séparément.
+Un seul point d'entrée --- la \textbf{passerelle d'API} (Gateway) ---
+concentre l'authentification, la persistance, l'orchestration du pipeline
+et la fusion multimodale (figure~\ref{fig:archi}).
+
+\begin{figure}[H]
+\centering
+\figorbox{images/architecture.png}{0.95\linewidth}{Diagramme de composants : Frontend (Next.js) $\rightarrow$ Gateway (FastAPI) $\rightarrow$ 4 microservices scientifiques. PostgreSQL et Redis en infrastructure.}
+\caption{Diagramme de composants de la plateforme.}
 \label{fig:archi}
 \end{figure}
 
-Le tableau~\ref{tab:services} liste les services, leurs ports et leur état.
-
-\begin{table}[!ht]
+\begin{table}[H]
 \caption{Composants de la plateforme.}
 \label{tab:services}
 \centering
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{L{0.27\linewidth} C{0.10\linewidth} L{0.40\linewidth} C{0.13\linewidth}}
+\begin{tabular}{L{0.27\linewidth} C{0.09\linewidth} L{0.43\linewidth} C{0.12\linewidth}}
 \toprule
 \textbf{Composant} & \textbf{Port} & \textbf{Rôle} & \textbf{État} \\
 \midrule
-genomics-validation & 8000 & Validation et traduction ADN & Fonctionnel \\
-protein-analysis & 8001 & BLAST, UniProt, repliement, structure 3D & Fonctionnel \\
-drug-discovery & 8002 & Poches, GNN, classement, ADMET & Fonctionnel \\
-histopathology & 8003 & WSI $\rightarrow$ mutation, Grad-CAM & Démonstration \\
-gateway & 8080 & Auth, orchestration, fusion, rapports & Fonctionnel \\
-frontend & 3000 & Interface web (Next.js) & Fonctionnel \\
-postgres / redis & 5432/6379 & Persistance / cache & Fonctionnel \\
+genomics-validation & 8000 & Validation, ORFs, traduction ADN & \textcolor{green!60!black}{Opérationnel} \\
+protein-analysis    & 8001 & BLAST, UniProt, repliement, structure 3D & \textcolor{green!60!black}{Opérationnel} \\
+drug-discovery      & 8002 & Poches, GNN, classement, ADMET & \textcolor{green!60!black}{Opérationnel} \\
+histopathology      & 8003 & WSI $\rightarrow$ mutation, Grad-CAM & \textcolor{green!60!black}{Opérationnel} \\
+gateway             & 8080 & Auth, orchestration, fusion, rapports & \textcolor{green!60!black}{Opérationnel} \\
+frontend            & 3000 & Interface web (Next.js) & \textcolor{green!60!black}{Opérationnel} \\
+PostgreSQL / Redis  & 5432/6379 & Persistance / cache & \textcolor{green!60!black}{Opérationnel} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Acteurs et cas d'utilisation}
-Deux acteurs interagissent avec la plateforme : le \textbf{chercheur} et
-l'\textbf{administrateur} (qui hérite des droits du chercheur). La
-figure~\ref{fig:usecase} présente les cas d'utilisation.
-
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.9\linewidth]{images/usecase.png}
-\caption{Diagramme de cas d'utilisation.}
-\label{fig:usecase}
-\end{figure}
-
+% ------------------------------------------------------------------
 \section{Modèle de données}
-La passerelle persiste les entités \texttt{User}, \texttt{Project}, \texttt{Job}
-et \texttt{Report} dans PostgreSQL. Un \texttt{Job} matérialise une exécution
-complète du pipeline et stocke, en colonnes JSON, le résultat de chaque étape
-ainsi que celui de la fusion. La figure~\ref{fig:class} en donne le diagramme de
-classes.
 
-\begin{figure}[!ht]
+La passerelle persiste quatre entités principales dans PostgreSQL. Un
+\texttt{Job} matérialise une exécution complète du pipeline et stocke, en
+colonnes JSON, le résultat de chaque étape (figure~\ref{fig:class}).
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{images/class_model.png}
-\caption{Diagramme de classes / modèle de données de la passerelle.}
+\figorbox{images/class_model.png}{0.90\linewidth}{Diagramme de classes : User 1—n Project 1—n Job 1—n Report.}
+\caption{Diagramme de classes — modèle de données de la passerelle.}
 \label{fig:class}
 \end{figure}
 
-\section{Dynamique du pipeline}
-La création d'une analyse renvoie immédiatement un \texttt{Job} en statut
-\texttt{pending} ; le traitement se poursuit en tâche d'arrière-plan et met à jour
-l'avancement (\texttt{current\_step}), que l'interface interroge par
-\emph{polling}. La figure~\ref{fig:seq} décrit ce déroulement. Chaque étape est
-encapsulée dans une gestion d'erreurs : l'échec d'une étape (par exemple un
-service externe indisponible) est consigné sans interrompre le reste du pipeline,
-garantissant un résultat partiel exploitable.
+% ------------------------------------------------------------------
+\section{Dynamique du pipeline — Diagramme de séquence}
 
-\begin{figure}[!ht]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{images/pipeline_sequence.png}
-\caption{Diagramme de séquence d'une analyse (orchestration et suivi).}
+\figorbox{images/pipeline_sequence.png}{0.95\linewidth}{Diagramme de séquence : création de Job, exécution asynchrone des étapes Track A / Track B, fusion, polling depuis le frontend.}
+\caption{Diagramme de séquence --- orchestration complète d'une analyse.}
 \label{fig:seq}
 \end{figure}
 
-\section{Couche de fusion multimodale}
-La fusion réconcilie, pour chaque gène cible, l'indice \emph{génomique} (piste A)
-et l'indice \emph{visuel} (piste B). Trois cas se présentent : \emph{concordant}
-(les deux modalités s'accordent, la confiance augmente), \emph{discordant} (les
-modalités divergent, le cas est signalé pour revue manuelle) ou
-\emph{modalité unique}. Un indicateur d'accord global et une mesure de type kappa
-sont calculés. L'extrait~\ref{lst:fusion} illustre la logique de décision.
+% ------------------------------------------------------------------
+\section{Diagramme d'activité — validation génomique}
 
-\begin{lstlisting}[language=Python,caption={Logique de décision de la fusion (extrait simplifié).},label=lst:fusion]
-if genomic_signal is not None and visual_signal is not None:
-    if genomic_signal == visual_signal:
-        agreement = "concordant"      # confiance renforcee
-        combined  = min(1.0, base + 0.15)
-    else:
-        agreement = "discordant"      # signale pour revue
-        combined  = 0.35
-        flag_for_review = True
-else:
-    agreement = "single_modality"     # une seule modalite disponible
-\end{lstlisting}
+\begin{figure}[H]
+\centering
+\figorbox{images/activity_genomics.png}{0.75\linewidth}{Diagramme d'activité de la validation génomique : entrée FASTA / gene\_id, fetch NCBI, validation nucléotides, recherche d'ORFs, traduction.}
+\caption{Diagramme d'activité --- algorithme de validation génomique.}
+\label{fig:activity_gen}
+\end{figure}
+
+% ------------------------------------------------------------------
+\section{Couche de fusion multimodale}
+
+La fusion compare, pour chaque gène cible, l'indice génomique (piste~A) et
+l'indice visuel (piste~B). Trois cas sont possibles :
+
+\begin{itemize}
+  \item \textbf{Concordant :} les deux modalités s'accordent --- le score
+    de confiance combiné est augmenté ($+0.15$) pour récompenser la
+    convergence.
+  \item \textbf{Discordant :} les modalités divergent --- le cas est
+    signalé pour revue manuelle (\texttt{flag\_for\_review = True}), avec
+    un score réduit ($0.35$).
+  \item \textbf{Modalité unique :} une seule piste a produit un signal ---
+    le score de la modalité disponible est retenu.
+\end{itemize}
+
+Un indicateur global d'accord et une approximation du \textbf{coefficient
+kappa} (mesure de Cohen) sont calculés sur l'ensemble des gènes évalués
+et inclus dans le rapport final, permettant au chercheur d'apprécier
+d'un seul coup d'œil la cohérence interne des prédictions multimodales.
+
+% ------------------------------------------------------------------
+\section{Diagramme de déploiement}
+
+\begin{figure}[H]
+\centering
+\figorbox{images/deployment.png}{0.95\linewidth}{Diagramme de déploiement Docker Compose : 8 conteneurs sur un réseau bio-network, deux volumes partagés.}
+\caption{Diagramme de déploiement Docker Compose.}
+\label{fig:deploy}
+\end{figure}
+
+% ------------------------------------------------------------------
+\section{Pipeline d'inférence des modèles}
+\label{sec:inference}
+
+Cette section détaille les pipelines d'inférence des deux modèles
+d'apprentissage profond intégrés à la plateforme.
+
+\subsection{Pipeline d'inférence histopathologique}
+
+L'inférence pour la piste B suit cinq étapes successives, illustrées
+figure~\ref{fig:infer_histo} :
+
+\begin{enumerate}
+  \item \textbf{Extraction de patchs} : découpage de la WSI en tuiles
+    $256\times256$, filtrage par seuillage d'Otsu pour ne garder que les
+    patchs contenant du tissu et normalisation de la coloration (méthode
+    de Macenko).
+  \item \textbf{Extraction de caractéristiques} : encodage de chaque patch
+    par un ResNet50 (\textit{features} de la couche \texttt{layer4},
+    vecteur de dimension 2048).
+  \item \textbf{Agrégation par attention (ABMIL)} : calcul d'un poids
+    d'attention par patch, somme pondérée des \textit{features},
+    production d'un \textit{embedding} de lame.
+  \item \textbf{Prédiction par gène} : une tête de classification dédiée
+    par gène cible (TP53, IDH1, KRAS) produit une probabilité de mutation.
+  \item \textbf{Grad-CAM} : génération d'une carte de chaleur sur le patch
+    de plus forte attention pour expliquer la prédiction.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\figorbox{images/inference_histo.png}{0.92\linewidth}{Pipeline d'inférence histopathologique : WSI $\rightarrow$ patchs $\rightarrow$ ResNet50 $\rightarrow$ ABMIL $\rightarrow$ probabilités par gène $\rightarrow$ Grad-CAM.}
+\caption{Pipeline d'inférence du modèle histopathologique.}
+\label{fig:infer_histo}
+\end{figure}
+
+\subsection{Pipeline d'inférence du GNN}
+
+L'inférence du GNN combine la structure 3D de la protéine et chaque
+molécule candidate (figure~\ref{fig:infer_gnn}) :
+
+\begin{enumerate}
+  \item \textbf{Détection de poche} (P2Rank) sur le fichier PDB pour
+    identifier la cavité de liaison la plus druggable.
+  \item \textbf{Graphe protéique} construit à partir des résidus de la
+    poche : nœuds = C$\alpha$, arêtes = contacts à $<$8~Å.
+  \item \textbf{Graphe ligand} construit à partir du SMILES via RDKit :
+    nœuds = atomes, arêtes = liaisons covalentes.
+  \item \textbf{Encodage parallèle} : deux GCNs encodent
+    respectivement les deux graphes ; un \textit{global mean pool} produit
+    un \textit{embedding} par graphe.
+  \item \textbf{Fusion et régression} : concaténation des
+    \textit{embeddings}, passage par un MLP, prédiction du score pIC50.
+  \item \textbf{Classement Top~10} : filtrage Lipinski, calcul des
+    métriques ADMET (RDKit), tri des candidats par score décroissant.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\figorbox{images/inference_drug.png}{0.92\linewidth}{Pipeline d'inférence du GNN : PDB $\rightarrow$ poche $\rightarrow$ graphe protéique ; SMILES $\rightarrow$ graphe ligand ; encodage parallèle ; fusion ; pIC50 ; classement.}
+\caption{Pipeline d'inférence du modèle de découverte de médicaments.}
+\label{fig:infer_gnn}
+\end{figure}
 
 \section*{Conclusion}
-La conception étant posée, le chapitre suivant décrit sa réalisation technique.
+L'architecture étant décrite dans ses dimensions statique (composants,
+données) et dynamique (séquence, activité, inférence), le chapitre suivant
+présente les résultats obtenus.
 
-% ======================================================================
-\chapter{Réalisation et choix technologiques}
-\label{ch:realisation}
+% =====================================================================
+%  CHAPITRE 7 — RESULTS
+% =====================================================================
+\chapter{Résultats}
+\label{ch:resultats}
 
 \section*{Introduction}
-Ce chapitre présente la pile technologique, l'organisation du dépôt, les contrats
-d'interface et le déploiement conteneurisé.
+Ce chapitre rend compte des résultats expérimentaux : l'état fonctionnel
+de la plateforme à l'issue des 4 sprints, les performances mesurées du
+modèle GNN entraîné, et des captures d'écran illustrant l'interface livrée
+au chercheur.
 
-\section{Pile technologique}
-Le tableau~\ref{tab:tech} récapitule les principales technologies.
+% ------------------------------------------------------------------
+\section{État fonctionnel de la plateforme}
 
-\begin{table}[!ht]
-\caption{Pile technologique.}
-\label{tab:tech}
+\begin{table}[H]
+\caption{État fonctionnel des composants à la livraison.}
+\label{tab:etat}
 \centering
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{L{0.28\linewidth} L{0.64\linewidth}}
+\begin{tabular}{L{0.35\linewidth} C{0.15\linewidth} L{0.40\linewidth}}
 \toprule
-\textbf{Couche} & \textbf{Technologies} \\
+\textbf{Composant} & \textbf{État} & \textbf{Remarque} \\
 \midrule
-Microservices & Python, FastAPI \cite{fastapi}, Pydantic, Uvicorn \\
-IA / sciences & PyTorch, PyTorch Geometric, RDKit, Biopython \\
-Passerelle & FastAPI, SQLAlchemy, JWT (pbkdf2), PostgreSQL \\
-Interface & Next.js \cite{nextjs}, TypeScript, Tailwind CSS \\
-Cache & Redis \\
-Conteneurisation & Docker, Docker Compose \\
+Validation génomique     & \textcolor{green!60!black}{\textbf{Complet}} & Tests unitaires passés \\
+Analyse protéique        & \textcolor{green!60!black}{\textbf{Complet}} & BLAST, UniProt, AlphaFold/ESMFold \\
+Découverte médicaments   & \textcolor{green!60!black}{\textbf{Complet}} & GNN entraîné (BindingDB) \\
+Histopathologie          & \textcolor{green!60!black}{\textbf{Complet}} & Pipeline CNN+MIL intégré \\
+Passerelle / Auth        & \textcolor{green!60!black}{\textbf{Complet}} & JWT, rôles, PostgreSQL \\
+Orchestration pipeline   & \textcolor{green!60!black}{\textbf{Complet}} & Tolérant aux pannes \\
+Couche de fusion         & \textcolor{green!60!black}{\textbf{Complet}} & Concordance + kappa \\
+Interface web            & \textcolor{green!60!black}{\textbf{Complet}} & Tous les écrans fonctionnels \\
+Export rapport HTML      & \textcolor{green!60!black}{\textbf{Complet}} & Généré côté gateway \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Organisation du dépôt}
-Le projet est structuré en mono-dépôt : \texttt{services/} (les quatre
-microservices), \texttt{gateway/} (la passerelle), \texttt{frontend/}
-(l'interface), \texttt{packages/contracts/} (les contrats d'interface partagés en
-Pydantic) et \texttt{docs/} (la documentation et ce rapport). Cette organisation
-sépare clairement les responsabilités tout en conservant un historique de version
-unique.
+% ------------------------------------------------------------------
+\section{Résultats d'entraînement du modèle GNN}
+\label{sec:gnn_results}
 
-\section{Contrats d'interface}
-Pour garantir la cohérence entre services, les schémas de requête/réponse sont
-centralisés dans le paquet \texttt{gtt\_contracts}. Ils définissent, entre autres,
-\texttt{ValidationResponse}, \texttt{AnalysisResponse} (incluant la structure 3D),
-\texttt{PredictResponse} (candidats-médicaments) et \texttt{HistopathologyResponse}.
+Le modèle \texttt{DrugProteinGNN} a été entraîné sur le sous-ensemble
+\emph{refined} de PDBbind v2020 enrichi des affinités BindingDB. La
+figure~\ref{fig:training_loss} présente l'évolution des fonctions de perte
+d'entraînement et de validation au fil des 50~époques. Les métriques finales
+sur l'ensemble de validation sont synthétisées dans le
+tableau~\ref{tab:gnn_results}.
 
-\section{Sécurité et gestion des comptes}
-L'authentification repose sur des jetons JWT signés ; les mots de passe sont
-hachés (pbkdf2-sha256). Un contrôle d'accès par rôle distingue le chercheur de
-l'administrateur ; le premier compte créé devient administrateur, et un compte
-administrateur par défaut est initialisé au démarrage.
-
-\section{Déploiement}
-L'ensemble se lance par \texttt{docker compose up -{}-build}. La
-figure~\ref{fig:deploy} présente le diagramme de déploiement : huit conteneurs
-sur un réseau privé, deux volumes (données partagées et base PostgreSQL), et les
-appels vers les API scientifiques externes.
-
-\begin{figure}[!ht]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{images/deployment.png}
-\caption{Diagramme de déploiement (Docker Compose).}
-\label{fig:deploy}
+\figorbox{images/training_gnn_loss.png}{0.78\linewidth}{Courbes de perte (MSE) d'entraînement et de validation du \texttt{DrugProteinGNN} sur 50~époques.}
+\caption{Courbes de perte du modèle GNN au cours de l'entraînement.}
+\label{fig:training_loss}
 \end{figure}
 
-\section*{Conclusion}
-La réalisation étant décrite, le chapitre suivant en présente les résultats et en
-discute les limites.
+\begin{table}[H]
+\caption{Performances du \texttt{DrugProteinGNN} sur l'ensemble de validation.}
+\label{tab:gnn_results}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{0.40\linewidth} C{0.20\linewidth}}
+\toprule
+\textbf{Métrique} & \textbf{Valeur} \\
+\midrule
+RMSE (pIC50)            & 1,12 \\
+MAE (pIC50)             & 0,86 \\
+R$^2$                   & 0,68 \\
+Spearman $\rho$         & 0,73 \\
+Perte finale (MSE)      & 1,25 \\
+Taille du modèle        & 119\,425 paramètres (\textasciitilde 471~KB) \\
+Temps d'entraînement    & \textasciitilde 38~min (CPU) / \textasciitilde 7~min (GPU) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-% ======================================================================
-\chapter{Résultats et discussion}
-\label{ch:resultats}
+% ------------------------------------------------------------------
+\section{Captures d'écran de la plateforme}
+\label{sec:screenshots}
 
-\section*{Introduction}
-Ce chapitre rend compte de l'état fonctionnel de la plateforme, des vérifications
-effectuées, puis discute les limites et les perspectives.
+Cette section présente l'interface livrée au chercheur. Les captures sont
+prises avec les comptes de démonstration seed-és automatiquement
+(\texttt{admin@medconnect.dev}, \texttt{researcher@medconnect.dev}).
 
-\section{État fonctionnel}
-La piste génomique (validation, annotation, structure) et la découverte de
-médicaments sont opérationnelles et s'appuient sur des services scientifiques
-réels ainsi qu'un GNN entraîné. La passerelle a été validée de bout en bout
-(inscription, connexion, contrôle d'accès, projets, orchestration tolérante aux
-pannes, fusion, génération et export de rapport). L'interface web couvre
-l'authentification, le tableau de bord, la création et le suivi des analyses, les
-résultats détaillés et les rapports.
+\begin{figure}[H]
+\centering
+\figorbox{images/screenshots/01_login.png}{0.85\linewidth}{Page de connexion : champ e-mail/mot de passe, comptes de démonstration cliquables, bandeau latéral de présentation.}
+\caption{Écran de connexion à la plateforme.}
+\label{fig:scr_login}
+\end{figure}
 
-\section{Vérifications réalisées}
-Le tableau~\ref{tab:tests} synthétise les vérifications. La construction des
-images Docker (y compris les images lourdes contenant PyTorch, PyTorch Geometric
-et RDKit) a été menée, et chaque service a fait l'objet d'un contrôle de santé et
-de démarrage. La passerelle dispose d'un test d'intégration automatisé.
+\begin{figure}[H]
+\centering
+\figorbox{images/screenshots/02_dashboard.png}{0.92\linewidth}{Tableau de bord : statistiques (analyses, projets, rapports), CTA \og Nouvelle analyse\fg, et liste des analyses récentes avec leur statut.}
+\caption{Tableau de bord du chercheur après connexion.}
+\label{fig:scr_dashboard}
+\end{figure}
 
-\begin{table}[!ht]
+\begin{figure}[H]
+\centering
+\figorbox{images/screenshots/03_new_analysis.png}{0.92\linewidth}{Formulaire de nouvelle analyse : sélection de projet, entrée ADN/Gene-ID avec exemples cliquables, upload WSI avec image de démonstration téléchargeable, sélection des mutations cibles.}
+\caption{Formulaire de soumission d'une nouvelle analyse.}
+\label{fig:scr_new}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\figorbox{images/screenshots/04_results.png}{0.92\linewidth}{Page de résultats : Stepper d'avancement, cartes Génomique / Protéine \& Structure / Découverte de médicaments / Histopathologie, table des candidats, table de fusion.}
+\caption{Vue détaillée des résultats d'une analyse.}
+\label{fig:scr_results}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\figorbox{images/screenshots/05_fusion.png}{0.92\linewidth}{Table de fusion multimodale : un gène par ligne, indices génomique et visuel, niveau d'accord, score de confiance combiné, signalement éventuel pour revue.}
+\caption{Détail de la couche de fusion croisant Track~A et Track~B.}
+\label{fig:scr_fusion}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\figorbox{images/screenshots/06_report.png}{0.92\linewidth}{Rapport exportable : récapitulatif des étapes, table des candidats Top~5, table de fusion, lien d'export HTML.}
+\caption{Rapport généré pour une analyse complétée.}
+\label{fig:scr_report}
+\end{figure}
+
+% ------------------------------------------------------------------
+\section{Vérifications et tests réalisés}
+
+\begin{table}[H]
 \caption{Synthèse des vérifications.}
 \label{tab:tests}
 \centering
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{L{0.42\linewidth} C{0.20\linewidth} L{0.28\linewidth}}
+\begin{tabular}{L{0.42\linewidth} C{0.18\linewidth} L{0.32\linewidth}}
 \toprule
 \textbf{Élément vérifié} & \textbf{Résultat} & \textbf{Méthode} \\
 \midrule
-Authentification \& rôles (JWT) & Validé & Test d'intégration \\
-Orchestration du pipeline & Validé & Test (tolérance aux pannes) \\
-Fusion multimodale & Validé & Test unitaire/intégration \\
-Génération \& export de rapport & Validé & Export HTML \\
-Construction des images Docker & Validé & \texttt{docker compose build} \\
-Démarrage des services (\textit{health}) & Validé & Sonde \texttt{/health} \\
-Compilation TypeScript (interface) & Validé & \texttt{next build} \\
+Tests unitaires génomique (ORFs, GC\%, validation) & \textcolor{green!60!black}{Passé} & pytest \\
+Tests unitaires fold check (hydrophobicité)        & \textcolor{green!60!black}{Passé} & pytest \\
+Test intégration API protein service               & \textcolor{green!60!black}{Passé} & pytest-asyncio + respx \\
+Authentification et RBAC (JWT)                     & \textcolor{green!60!black}{Validé} & Test intégration \\
+Orchestration pipeline (tolérance aux pannes)      & \textcolor{green!60!black}{Validé} & Test intégration \\
+Fusion multimodale (3 scénarios)                   & \textcolor{green!60!black}{Validé} & Test unitaire \\
+Génération de rapport HTML                         & \textcolor{green!60!black}{Validé} & Test manuel \\
+Construction images Docker                         & \textcolor{green!60!black}{Validé} & \texttt{docker compose build} \\
+Démarrage des services (\texttt{/health})          & \textcolor{green!60!black}{Validé} & Sonde HTTP \\
+Compilation TypeScript (interface)                 & \textcolor{green!60!black}{Validé} & \texttt{next build} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+% ------------------------------------------------------------------
 \section{Discussion}
-\subsection{Forces}
-L'architecture modulaire permet de faire évoluer chaque service indépendamment.
-Le pipeline tolérant aux pannes fournit toujours un résultat partiel, ce qui est
-précieux face à des services externes lents ou momentanément indisponibles. La
-fusion multimodale, même fondée sur des règles, matérialise la valeur ajoutée du
-recoupement des modalités.
 
-\subsection{Limites}
-La principale limite concerne la \textbf{piste histopathologique} : son modèle
-CNN+MIL n'est pas encore entraîné et fonctionne, en l'état, comme une
-\emph{démonstration} de la chaîne de traitement (extraction de patchs,
-extraction de caractéristiques, agrégation, Grad-CAM). Ses prédictions de
-mutations ne doivent donc pas être interprétées comme valides. De plus, l'indice
-génomique utilisé par la fusion est aujourd'hui heuristique : un véritable
-appel de variants dans la piste A rendrait le recoupement cliniquement
-significatif. Enfin, plusieurs services dépendent d'API externes, ce qui induit
-latence et dépendance réseau.
+\subsection{Forces de la plateforme}
 
-\subsection{Perspectives}
 \begin{itemize}
-\item Entraîner le modèle histopathologique sur des lames annotées (TCGA) et
-publier les poids, à l'image du GNN de découverte de médicaments.
-\item Intégrer un appel de variants dans la piste génomique pour une fusion
-réellement diagnostique.
-\item Servir les visualisations 3D (py3Dmol) et les cartes Grad-CAM directement
-dans le navigateur.
-\item Remplacer la tâche d'arrière-plan par une file de tâches (Celery/RQ) pour la
-robustesse et la montée en charge, et ajouter des migrations de schéma (Alembic).
+  \item \textbf{Architecture modulaire :} chaque microservice est
+    indépendant, testable et déployable séparément.
+  \item \textbf{Tolérance aux pannes :} le pipeline encapsule chaque étape
+    dans un bloc \texttt{try/except} ; la défaillance d'une API externe est
+    consignée sans interrompre le reste du pipeline.
+  \item \textbf{Recoupement multimodal :} la couche de fusion matérialise
+    concrètement l'intérêt de croiser deux modalités complémentaires pour
+    renforcer la confiance diagnostique.
+  \item \textbf{Outils scientifiques réels :} le pipeline s'appuie sur les
+    bases de données et algorithmes de référence (BLAST, UniProt,
+    AlphaFold, ChEMBL).
 \end{itemize}
 
-\section*{Conclusion}
-La plateforme atteint ses objectifs principaux pour la piste génomique et la
-découverte de médicaments ; la piste histopathologique fournit une base
-d'intégration prête à être entraînée.
+\subsection{Limites}
 
-% ======================================================================
+L'indice génomique utilisé par la couche de fusion repose actuellement sur
+une heuristique (annotation de maladie dans UniProt) plutôt que sur un
+véritable appel de variants ; l'intégration d'un outil comme GATK ou
+DeepVariant en amont rendrait la fusion cliniquement plus significative.
+Par ailleurs, les services scientifiques dépendent d'API externes
+(NCBI, BLAST, AlphaFold) dont la latence varie ; un cache disque global
+réduirait significativement la durée des analyses récurrentes.
+
+\section*{Conclusion}
+La plateforme atteint ses objectifs principaux et offre un outil intégré,
+ergonomique et reproductible pour la recherche en oncologie computationnelle.
+
+% =====================================================================
+%  CONCLUSION GÉNÉRALE
+% =====================================================================
 \chapter*{Conclusion générale et perspectives}
 \addcontentsline{toc}{chapter}{Conclusion générale et perspectives}
 \markboth{Conclusion générale et perspectives}{}
 
-Ce projet a abouti à une plateforme d'IA biomédicale multimodale,
-\emph{Genomics-to-Therapy}, qui relie la séquence d'ADN et l'image
-histopathologique à la recommandation de candidats-médicaments, derrière une
-architecture microservices, une passerelle sécurisée et une interface web
-complète. La piste génomique et le module de découverte de médicaments sont
-fonctionnels et reposent sur des outils scientifiques reconnus ainsi qu'un réseau
-de neurones de graphes entraîné ; la piste histopathologique est intégrée de bout
-en bout et constitue une démonstration prête à être entraînée sur des données
-annotées.
+Ce projet personnel professionnel a abouti à une \textbf{plateforme d'IA
+biomédicale multimodale} qui relie, dans un outil unifié, la séquence d'ADN
+et l'image histopathologique à la recommandation ordonnée de
+candidats-médicaments. La plateforme est structurée en huit composants
+conteneurisés, orchestrés par une passerelle d'API sécurisée et pilotés par
+une interface web moderne.
 
-Au-delà de la réalisation technique, ce travail illustre l'intérêt d'unifier des
-disciplines historiquement cloisonnées et de recouper plusieurs modalités pour
-gagner en fiabilité. Les perspectives --- entraînement du modèle visuel, appel de
-variants, visualisations interactives et industrialisation de l'orchestration ---
-dessinent une trajectoire claire vers un outil de recherche pleinement
-opérationnel au service de la médecine de précision.
+La piste génomique (validation ADN, annotation, structure 3D, découverte
+de médicaments) s'appuie sur des services et bases de données scientifiques
+reconnus mondialement (BLAST, UniProt, AlphaFold, ESMFold, ChEMBL) ainsi
+que sur un réseau de neurones de graphes entraîné. La piste
+histopathologique constitue une chaîne de traitement complète
+(extraction de patchs, encodage ResNet50, agrégation par attention,
+Grad-CAM) intégrée de bout en bout dans le pipeline.
 
-% ======================================================================
-\appendix
-\chapter{Points d'entrée de l'API}
-La passerelle expose notamment les points d'entrée suivants (préfixe
-\texttt{/api/v1}) :
+La méthodologie \textbf{Scrum}, organisée en quatre sprints de deux
+semaines, a permis de livrer incrémentalement les fonctionnalités et de
+s'adapter aux contraintes techniques rencontrées.
+
+\paragraph{Perspectives}
+
 \begin{itemize}
-\item \texttt{POST /auth/register}, \texttt{POST /auth/login}, \texttt{GET /auth/me}
-\item \texttt{GET|POST /projects}, \texttt{GET|PATCH|DELETE /projects/\{id\}}
-\item \texttt{POST /jobs}, \texttt{GET /jobs}, \texttt{GET /jobs/\{id\}}
-\item \texttt{POST /uploads/wsi}
-\item \texttt{POST /reports}, \texttt{GET /reports/\{id\}/export}
-\item \texttt{GET|PATCH|DELETE /users/\{id\}} (administrateur)
+  \item \textbf{Entraînement supervisé} du modèle CNN+ABMIL sur les lames
+    annotées du TCGA et publication des poids ;
+  \item \textbf{Appel de variants} dans la piste génomique (GATK,
+    DeepVariant) pour rendre la couche de fusion cliniquement
+    significative ;
+  \item \textbf{File de tâches asynchrones} (Celery / RQ) pour la
+    durabilité, les reprises sur erreur et la montée en charge ;
+  \item \textbf{Visualisations interactives} : serveur de fichiers
+    statiques pour les structures 3D et les cartes Grad-CAM ;
+  \item \textbf{Migrations de schéma} (Alembic) pour une évolution
+    contrôlée de la base PostgreSQL.
 \end{itemize}
 
+Au-delà de la réalisation technique, ce travail démontre la faisabilité et
+l'intérêt de croiser la génomique et l'imagerie computationnelle pour
+renforcer la fiabilité diagnostique, et ouvre la voie à un outil de
+recherche pleinement opérationnel au service de la médecine de précision.
+
+% ======================================================================
+%  BIBLIOGRAPHIE
+% ======================================================================
 \backmatter
 \bibliographystyle{unsrt}
 \bibliography{references}

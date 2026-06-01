@@ -1,0 +1,73 @@
+@startuml deployment
+skinparam backgroundColor #FEFEFE
+skinparam node {
+  BackgroundColor #EBF5FB
+  BorderColor #2E86C1
+}
+skinparam database {
+  BackgroundColor #FEF9E7
+  BorderColor #F39C12
+}
+skinparam artifact {
+  BackgroundColor #EAFAF1
+  BorderColor #27AE60
+}
+
+node "Machine Hôte (Windows/Linux)" {
+
+  node "Réseau Docker : bio-network" {
+
+    node "gtt-frontend\n(Node:18-alpine)" {
+      artifact "Next.js App\n:3000"
+    }
+
+    node "gtt-gateway\n(Python:3.11-slim)" {
+      artifact "FastAPI Gateway\n:8080"
+    }
+
+    node "genomics-validation\n(Python:3.11-slim)" {
+      artifact "FastAPI Service\n:8000"
+    }
+
+    node "protein-analysis-service\n(Python:3.11-slim)" {
+      artifact "FastAPI Service\n:8001"
+    }
+
+    node "drug-discovery-service\n(Python:3.11-slim)" {
+      artifact "FastAPI Service\n:8002"
+      artifact "GNN Model\ngnn_v1.pt"
+    }
+
+    node "histopathology-service\n(Python:3.11-slim)" {
+      artifact "FastAPI Service\n:8003"
+    }
+
+    database "gtt-postgres\n(postgres:16-alpine)" {
+      artifact "DB: gtt\n:5432"
+    }
+
+    database "gtt-redis\n(redis:alpine)" {
+      artifact "Cache\n:6379"
+    }
+  }
+
+  storage "Volume : bio-data\n/data/structures" as VOL
+  storage "Volume : pg-data\n/var/lib/postgresql" as PGVOL
+}
+
+"gtt-frontend" --> "gtt-gateway" : HTTP :8080
+"gtt-gateway" --> "genomics-validation" : HTTP :8000
+"gtt-gateway" --> "protein-analysis-service" : HTTP :8001
+"gtt-gateway" --> "drug-discovery-service" : HTTP :8002
+"gtt-gateway" --> "histopathology-service" : HTTP :8003
+"gtt-gateway" --> "gtt-postgres" : psycopg2 :5432
+"genomics-validation" --> "gtt-redis" : redis-py :6379
+"protein-analysis-service" --> "gtt-redis" : redis-py :6379
+"drug-discovery-service" --> "gtt-redis" : redis-py :6379
+"protein-analysis-service" --> VOL : écriture PDB
+"drug-discovery-service" --> VOL : écriture viz HTML
+"histopathology-service" --> VOL : écriture Grad-CAM
+"gtt-gateway" --> VOL : lecture/écriture uploads
+"gtt-postgres" --> PGVOL : persistance
+
+@enduml

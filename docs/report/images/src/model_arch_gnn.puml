@@ -1,0 +1,37 @@
+@startuml model_arch_gnn
+!theme plain
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 16
+skinparam rectangle {
+  RoundCorner 10
+  BackgroundColor #EAF2FB
+  BorderColor #1F618D
+  FontSize 16
+}
+skinparam Padding 6
+skinparam nodesep 30
+skinparam ranksep 30
+
+title <size:22><b>DrugProteinGNN — Architecture du modèle</b></size>
+
+rectangle "<b>Entrée 1 — Poche protéique</b>\n• Graphe résidus de la poche\n• N × 25 features par nœud\n• Arêtes : Cα–Cα < 8 Å" as PROT_IN #FCEBEA
+rectangle "<b>Entrée 2 — Molécule candidate</b>\n• Graphe atomes (RDKit)\n• M × 5 features par nœud\n• Arêtes : liaisons covalentes" as DRUG_IN #E8F8F5
+
+rectangle "<b>Encodeur protéine</b>\nGCNConv  25 → 128 + ReLU\nGCNConv 128 → 128\nGlobal Mean Pool → 128-d" as ENC_P #D6EAF8
+rectangle "<b>Encodeur molécule</b>\nGCNConv   5 → 128 + ReLU\nGCNConv 128 → 128\nGlobal Mean Pool → 128-d" as ENC_D #D6EAF8
+
+rectangle "<b>Concaténation</b>\n128 + 128 = 256-d" as CONCAT #FDEBD0
+
+rectangle "<b>MLP de fusion</b>\nLinear 256 → 256 + ReLU + Dropout 0.2\nLinear 256 → 64  + ReLU\nLinear  64 → 1" as MLP #D6EAF8
+
+rectangle "<b>Sortie</b>\nScore pIC50 (régression)" as Y #D5F5E3
+
+PROT_IN -down-> ENC_P
+DRUG_IN -down-> ENC_D
+ENC_P -down-> CONCAT
+ENC_D -down-> CONCAT
+CONCAT -down-> MLP
+MLP -down-> Y
+
+@enduml

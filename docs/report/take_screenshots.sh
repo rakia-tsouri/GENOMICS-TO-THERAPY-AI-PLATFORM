@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Capture the 6 platform screenshots used in the Results chapter of the report.
+# Prereqs:
+#   - docker compose stack running (frontend on :3000, gateway on :8080)
+#   - public/auth_bridge.html present in the running frontend container
+#     (in this repo it's at frontend/public/auth_bridge.html ; it ships into
+#      the image at build time)
+#   - Google Chrome installed at the standard macOS location
+#
+# Usage:  bash docs/report/take_screenshots.sh
+set -eu
+
+CHROME='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+GW=http://localhost:8080/api/v1
+WEB=http://localhost:3000
+SHOTS="$(cd "$(dirname "$0")" && pwd)/images/screenshots"
+mkdir -p "$SHOTS"
+rm -f "$SHOTS"/*.png
+
+# 1. login as the seeded demo researcher
+TOK=$(curl -fs -X POST "$GW/auth/login" -H 'Content-Type: application/json' \
+  -d '{"email":"researcher@medconnect.dev","password":"research12345"}' \
+  | python3 -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
+
+# 2. pick a seeded job/report (first one, which is the oldest = TP53 reference)
+JID=$(curl -fs "$GW/jobs" -H "Authorization: Bearer $TOK" \
+  | python3 -c "import sys,json;j=json.load(sys.stdin);print(j[-1]['id'])")
+RID=$(curl -fs "$GW/reports" -H "Authorization: Bearer $TOK" \
+  | python3 -c "import sys,json;r=json.load(sys.stdin);print(r[-1]['id'])")
+echo "Using seeded job_id=$JID  report_id=$RID"
+
+enc() { python3 -c "import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1]))" "$1"; }
+
+shot() {
+  local name=$1 path=$2 budget=${3:-15000}
+  local url="$WEB/auth_bridge.html?token=$TOK&to=$(enc "$path")"
+  "$CHROME" --headless=new --hide-scrollbars --disable-gpu --no-sandbox \
+    --window-size=1440,1100 --virtual-time-budget="$budget" \
+    --screenshot="$SHOTS/$name.png" "$url" 2>/dev/null
+  printf "  %-22s %s bytes\n" "$name.png" "$(stat -f%z "$SHOTS/$name.png" 2>/dev/null)"
+}
+
+# 3. login screenshot — no auth needed
+"$CHROME" --headless=new --hide-scrollbars --disable-gpu --no-sandbox \
+  --window-size=1440,900 --virtual-time-budget=6000 \
+  --screenshot="$SHOTS/01_login.png" "$WEB/login" 2>/dev/null
+printf "  %-22s %s bytes\n" "01_login.png" "$(stat -f%z "$SHOTS/01_login.png")"
+
+shot 02_dashboard      /dashboard
+shot 03_new_analysis   /jobs/new
+# generous budget so 3Dmol.js fetches the PDB and renders
+shot 04_results        "/jobs/$JID" 22000
+shot 05_fusion         "/jobs/$JID" 22000
+shot 06_report         "/reports/$RID" 12000
+
+echo "Done. Screenshots saved to $SHOTS"

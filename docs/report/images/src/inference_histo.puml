@@ -1,0 +1,40 @@
+@startuml inference_histo
+!theme plain
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 13
+skinparam activityArrowColor #1F618D
+skinparam activityBorderColor #1F618D
+skinparam activityBackgroundColor #EAF2FB
+skinparam activityDiamondBackgroundColor #FDEBD0
+skinparam activityDiamondBorderColor #1F618D
+
+title Pipeline d'inférence histopathologique (Track B)
+
+start
+:Upload WSI\n(.svs / .tiff / .png);
+:Découpage en patchs 256×256;
+:Otsu thresholding\n(filtre fond);
+:Normalisation de coloration\n(Macenko);
+if (≥ 1 patch utile ?) then (oui)
+  :Encodage ResNet50\n(layer4 → 2048-d)\npar patch;
+  :Calcul des poids d'attention\n(ABMIL);
+  :Agrégation pondérée\n→ embedding lame;
+  fork
+    :Tête TP53;
+  fork again
+    :Tête IDH1;
+  fork again
+    :Tête KRAS;
+  end fork
+  :Probabilités par gène + label;
+  :Grad-CAM sur patch top-attention;
+  :Sauvegarde heatmap PNG\n(volume partagé);
+  :Retour résultat JSON\n+ chemin Grad-CAM;
+  stop
+else (non)
+  :Statut "failed"\nraison: aucun patch utile;
+  stop
+endif
+
+@enduml

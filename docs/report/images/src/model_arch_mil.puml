@@ -1,0 +1,42 @@
+@startuml model_arch_mil
+!theme plain
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 16
+skinparam rectangle {
+  RoundCorner 10
+  BackgroundColor #EAF2FB
+  BorderColor #1F618D
+  FontSize 16
+}
+skinparam Padding 6
+skinparam nodesep 25
+skinparam ranksep 25
+
+title <size:22><b>CNN + Attention-MIL — Architecture</b></size>
+
+rectangle "<b>WSI (Whole Slide Image)</b>\n100k × 100k px · plusieurs Go" as WSI #FCEBEA
+
+rectangle "<b>Extraction de patchs</b>\nTuiles 256 × 256 px\nOtsu (filtre fond) + Macenko" as PATCH
+
+rectangle "<b>ResNet50 (pré-entraîné ImageNet)</b>\nlayer4 → vecteur 2048-d\npar patch" as RESNET #D6EAF8
+
+rectangle "<b>Features par patch</b>\nN × 2048-d" as FEAT #FDEBD0
+
+rectangle "<b>Attention MLP (gated ABMIL)</b>\nh → tanh → softmax\n→ poids αᵢ par patch" as ATT #FEF5E7
+
+rectangle "<b>Pooling pondéré</b>\nz = Σ αᵢ · hᵢ → embedding lame" as POOL #D6EAF8
+
+rectangle "<b>Têtes de classification (sigmoid)</b>\nTête TP53      ·      Tête IDH1      ·      Tête KRAS" as HEADS #D5F5E3
+
+rectangle "<b>Grad-CAM</b>\nHooks sur layer4 → carte de chaleur\nsur le patch de plus forte attention" as GC #FADBD8
+
+WSI -down-> PATCH
+PATCH -down-> RESNET
+RESNET -down-> FEAT
+FEAT -down-> ATT
+ATT -down-> POOL
+POOL -down-> HEADS
+RESNET .right.> GC : hooks gradients
+
+@enduml
