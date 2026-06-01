@@ -1,0 +1,82 @@
+@startuml class_model
+skinparam backgroundColor #FEFEFE
+skinparam class {
+  BackgroundColor #EBF5FB
+  BorderColor #2E86C1
+  ArrowColor #2E86C1
+  HeaderBackgroundColor #2E86C1
+  HeaderFontColor #FFFFFF
+}
+
+enum Role {
+  researcher
+  admin
+}
+
+class User {
+  +id : Integer <<PK>>
+  +email : String <<unique>>
+  +hashed_password : String
+  +full_name : String
+  +role : Role
+  +is_active : Boolean
+  +created_at : DateTime
+  --
+  +register()
+  +login()
+}
+
+class Project {
+  +id : Integer <<PK>>
+  +name : String
+  +description : String
+  +cancer_type : String
+  +created_at : DateTime
+  +owner_id : Integer <<FK>>
+  --
+  +create()
+  +update()
+  +delete()
+}
+
+class Job {
+  +id : Integer <<PK>>
+  +project_id : Integer <<FK>>
+  +user_id : Integer <<FK>>
+  +status : String
+  +current_step : String
+  +gene_id : String
+  +dna_sequence : String
+  +wsi_image_path : String
+  +target_mutations : JSON
+  +validation_result : JSON
+  +analysis_result : JSON
+  +drug_result : JSON
+  +histopathology_result : JSON
+  +fusion_result : JSON
+  +error : String
+  +created_at : DateTime
+  +completed_at : DateTime
+  --
+  +submit()
+  +poll_status()
+}
+
+class Report {
+  +id : Integer <<PK>>
+  +job_id : Integer <<FK>>
+  +title : String
+  +content_html : String
+  +created_at : DateTime
+  --
+  +generate()
+  +export_pdf()
+}
+
+User "1" --o{ "many" Project : possède
+User "1" --o{ "many" Job : soumet
+Project "1" --o{ "many" Job : contient
+Job "1" --o{ "0..1" Report : produit
+User ..> Role : a un
+
+@enduml

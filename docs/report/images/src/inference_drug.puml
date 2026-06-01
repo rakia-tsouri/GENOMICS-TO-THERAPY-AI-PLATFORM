@@ -1,0 +1,35 @@
+@startuml inference_drug
+!theme plain
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 13
+skinparam activityArrowColor #1F618D
+skinparam activityBorderColor #1F618D
+skinparam activityBackgroundColor #EAF2FB
+skinparam activityDiamondBackgroundColor #FDEBD0
+
+title Pipeline d'inférence — Découverte de médicaments
+
+start
+:Structure 3D protéique\n(fichier PDB);
+:Détection de poches (P2Rank ML);
+:Sélection meilleure poche\n(druggabilité × proximité sites UniProt);
+:Graphe protéique\n(résidus poche, edges < 8 Å);
+fork
+  :Récupération candidats\n(ChEMBL + ZINC15);
+  :Filtre Lipinski\n(MW, LogP, HBD, HBA);
+  :SMILES → graphe moléculaire\n(RDKit);
+fork again
+  :Graphe protéique (déjà construit);
+end fork
+:GNN forward\n(encodeurs parallèles + fusion MLP);
+:Score pIC50 par candidat;
+:Calcul ADMET\n(MW, LogP, TPSA, biodisponibilité);
+:Évaluation toxicité\n(SMARTS structuraux);
+:Tri par score d'affinité;
+:Top 10 candidats;
+:Visualisation 3D du complexe\n(3Dmol.js);
+:Réponse JSON + chemin visualisation;
+stop
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml usecase
+skinparam backgroundColor #FEFEFE
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EBF5FB
+  BorderColor #2E86C1
+  ArrowColor #2E86C1
+}
+
+left to right direction
+
+actor "Chercheur" as Chercheur
+actor "Administrateur" as Admin
+
+rectangle "Plateforme Genomics-to-Therapy" {
+  usecase "S'inscrire / Se connecter" as UC1
+  usecase "Gérer son profil" as UC2
+  usecase "Créer un projet" as UC3
+  usecase "Soumettre une analyse\n(ADN + Image)" as UC4
+  usecase "Suivre l'avancement\nd'une analyse" as UC5
+  usecase "Consulter les résultats\n(protéine, médicaments)" as UC6
+  usecase "Visualiser la carte\nGrad-CAM" as UC7
+  usecase "Exporter un rapport\n(HTML/PDF)" as UC8
+  usecase "Gérer les utilisateurs" as UC9
+  usecase "Consulter toutes\nles analyses" as UC10
+}
+
+Chercheur --> UC1
+Chercheur --> UC2
+Chercheur --> UC3
+Chercheur --> UC4
+Chercheur --> UC5
+Chercheur --> UC6
+Chercheur --> UC7
+Chercheur --> UC8
+
+Admin --|> Chercheur
+Admin --> UC9
+Admin --> UC10
+
+UC4 ..> UC3 : <<include>>
+UC6 ..> UC4 : <<extend>>
+UC7 ..> UC6 : <<extend>>
+UC8 ..> UC6 : <<extend>>
+
+@enduml

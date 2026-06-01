@@ -1,0 +1,75 @@
+@startuml component_architecture
+skinparam backgroundColor #FEFEFE
+skinparam component {
+  BackgroundColor #EBF5FB
+  BorderColor #2E86C1
+}
+skinparam database {
+  BackgroundColor #FEF9E7
+  BorderColor #F39C12
+}
+skinparam cloud {
+  BackgroundColor #EAFAF1
+  BorderColor #27AE60
+}
+skinparam node {
+  BackgroundColor #F4ECF7
+  BorderColor #8E44AD
+}
+
+node "Client (navigateur)" {
+  [Frontend\nNext.js :3000] as FE
+}
+
+node "Docker Network : bio-network" {
+  [Gateway API\nFastAPI :8080] as GW
+
+  package "Track A — Génomique" {
+    [Genomics Validation\nFastAPI :8000] as GEN
+    [Protein Analysis\nFastAPI :8001] as PROT
+  }
+
+  package "Track B — Histopathologie" {
+    [Histopathology\nFastAPI :8003] as HISTO
+  }
+
+  [Drug Discovery\nFastAPI :8002] as DRUG
+
+  database "PostgreSQL :5432\n(users, projects,\njobs, reports)" as PG
+  database "Redis :6379\n(cache séquences,\ncache BLAST/UniProt)" as REDIS
+}
+
+cloud "APIs Scientifiques Externes" {
+  [NCBI Entrez\n(séquences ADN)]
+  [BLAST / SwissProt]
+  [UniProt REST API]
+  [AlphaFold DB API]
+  [ESMFold API\n(Meta)]
+  [ChEMBL API]
+  [FoldIndex / IUPred2A]
+}
+
+volume "Volume partagé bio-data\n/data/structures\n(PDB, Grad-CAM, Viz 3D)" as VOL
+
+FE --> GW : HTTP/REST (JWT)
+GW --> PG : SQLAlchemy ORM
+GW --> GEN : HTTP POST
+GW --> PROT : HTTP POST
+GW --> DRUG : HTTP POST
+GW --> HISTO : HTTP POST
+GEN --> REDIS : cache séquences
+PROT --> REDIS : cache BLAST/UniProt
+DRUG --> REDIS : cache prédictions
+PROT --> VOL : sauvegarde .pdb
+DRUG --> VOL : sauvegarde viz HTML
+HISTO --> VOL : sauvegarde Grad-CAM
+GW --> VOL : accès fichiers
+GEN ..> [NCBI Entrez\n(séquences ADN)] : Biopython
+PROT ..> [BLAST / SwissProt] : NCBIWWW
+PROT ..> [UniProt REST API] : httpx
+PROT ..> [AlphaFold DB API] : httpx
+PROT ..> [ESMFold API\n(Meta)] : httpx
+DRUG ..> [ChEMBL API] : httpx
+PROT ..> [FoldIndex / IUPred2A] : httpx
+
+@enduml

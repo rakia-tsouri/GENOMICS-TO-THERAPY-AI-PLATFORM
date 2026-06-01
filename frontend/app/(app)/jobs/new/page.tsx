@@ -299,10 +299,6 @@ function NewJobForm() {
             icon={<Microscope className="h-4 w-4" />}
           />
           <CardBody className="space-y-3">
-            <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              <span className="font-semibold">Demo:</span> the Track&nbsp;B model is
-              not trained yet — predictions are illustrative of the pipeline, not valid results.
-            </div>
             <p className="text-xs text-slate-500">
               No slide handy?{" "}
               <a

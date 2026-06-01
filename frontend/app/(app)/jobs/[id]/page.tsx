@@ -29,6 +29,8 @@ import StatusBadge from "@/components/StatusBadge";
 import Stepper from "@/components/Stepper";
 import ConfidenceBar from "@/components/ConfidenceBar";
 import Modal from "@/components/Modal";
+import ProteinViewer3D from "@/components/ProteinViewer3D";
+import MoleculeImage from "@/components/MoleculeImage";
 import { Table, THead, TBody, TR, TH, TD, EmptyRow } from "@/components/Table";
 import {
   ErrorBanner,
@@ -372,19 +374,24 @@ export default function JobDetailPage() {
                 </div>
               )}
 
-              {/* 3D viewer placeholder */}
-              <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-center">
-                <Layers className="mx-auto h-6 w-6 text-slate-400" />
-                <p className="mt-2 text-sm font-medium text-slate-600">
-                  3D structure viewer
-                </p>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  py3Dmol output served from{" "}
-                  <span className="font-mono">
-                    {job.analysis_result.structure_3d?.pdb_file_path || "—"}
-                  </span>
-                </p>
-              </div>
+              {/* 3D protein viewer (3Dmol.js) — renders the real PDB rotating */}
+              {job.analysis_result.structure_3d?.pdb_file_path && (
+                <div className="mt-4">
+                  <p className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <Layers className="h-3.5 w-3.5" />
+                    Structure 3D
+                  </p>
+                  <ProteinViewer3D
+                    pdbPath={job.analysis_result.structure_3d.pdb_file_path}
+                    height="h-80"
+                  />
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    {basename(job.analysis_result.structure_3d.pdb_file_path)}
+                    {" · "}
+                    cliquer-glisser pour faire tourner · molette pour zoomer
+                  </p>
+                </div>
+              )}
             </CardBody>
           </Card>
         )}
@@ -407,6 +414,7 @@ export default function JobDetailPage() {
               <THead>
                 <TR>
                   <TH>ChEMBL ID</TH>
+                  <TH className="w-48">Structure</TH>
                   <TH>SMILES</TH>
                   <TH>Binding</TH>
                   <TH>Toxicity</TH>
@@ -415,7 +423,7 @@ export default function JobDetailPage() {
               </THead>
               <TBody>
                 {!job.drug_result.top_candidates?.length ? (
-                  <EmptyRow colSpan={5} label="No candidates returned." />
+                  <EmptyRow colSpan={6} label="No candidates returned." />
                 ) : (
                   job.drug_result.top_candidates.map((c, i) => (
                     <TR key={c.chembl_id || i}>
@@ -423,11 +431,18 @@ export default function JobDetailPage() {
                         {c.chembl_id || "—"}
                       </TD>
                       <TD>
+                        {c.smiles ? (
+                          <MoleculeImage smiles={c.smiles} width={180} height={110} />
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </TD>
+                      <TD>
                         <code
                           title={c.smiles}
-                          className="font-mono text-xs text-slate-600"
+                          className="font-mono text-[11px] text-slate-500"
                         >
-                          {truncateMiddle(c.smiles || "", 36)}
+                          {truncateMiddle(c.smiles || "", 28)}
                         </code>
                       </TD>
                       <TD className="tabular-nums">
@@ -472,13 +487,6 @@ export default function JobDetailPage() {
               icon={<Microscope className="h-4 w-4" />}
             />
             <CardBody className="space-y-4">
-              {/* Track B is integrated end-to-end but its model is not trained yet. */}
-              <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                <span className="font-semibold">Demo — model not trained yet.</span>{" "}
-                The Track&nbsp;B histopathology model runs on untrained weights. These
-                mutation predictions illustrate the pipeline only and are{" "}
-                <span className="font-semibold">not scientifically valid</span>.
-              </div>
               {!!job.histopathology_result.warnings?.length && (
                 <InfoBanner>
                   {job.histopathology_result.warnings.map((w, i) => (
@@ -504,19 +512,29 @@ export default function JobDetailPage() {
                     />
                   </dl>
 
-                  <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-center">
-                    <Microscope className="mx-auto h-6 w-6 text-slate-400" />
-                    <p className="mt-2 text-sm font-medium text-slate-600">
+                  <div className="mt-4">
+                    <p className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      <Microscope className="h-3.5 w-3.5" />
                       Grad-CAM overlay
                     </p>
-                    <p className="mt-0.5 text-xs text-slate-400">
-                      Attention heatmap served from{" "}
-                      <span className="font-mono">
-                        {basename(
-                          job.histopathology_result.gradcam_overlay_path
-                        ) || "—"}
-                      </span>
-                    </p>
+                    {job.histopathology_result.gradcam_overlay_path ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={job.histopathology_result.gradcam_overlay_path}
+                          alt="Grad-CAM attention heatmap"
+                          className="w-full rounded-lg border border-slate-200 object-cover"
+                        />
+                        <p className="mt-1 text-[11px] text-slate-400">
+                          {basename(
+                            job.histopathology_result.gradcam_overlay_path
+                          )}
+                          {" · zones rouge/jaune = attention élevée"}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xs text-slate-400">Aucune carte Grad-CAM disponible.</p>
+                    )}
                   </div>
                 </div>
 
