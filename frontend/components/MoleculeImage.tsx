@@ -21,32 +21,38 @@ export default function MoleculeImage({
 
   useEffect(() => {
     let cancelled = false;
+
+    type DrawerInstance = {
+      draw: (parsed: unknown, target: HTMLCanvasElement, theme: string) => void;
+    };
+    type SDApi = {
+      Drawer: new (opts: Record<string, unknown>) => DrawerInstance;
+      parse: (
+        s: string,
+        ok: (tree: unknown) => void,
+        err?: (e: unknown) => void
+      ) => void;
+    };
+
     async function draw() {
       if (!canvasRef.current || !smiles) return;
       try {
-        // smiles-drawer is a UMD module; default import works at runtime
-        const mod = (await import("smiles-drawer")) as unknown as {
-          default?: {
-            Drawer: new (opts: Record<string, unknown>) => {
-              draw: (parsed: unknown, target: HTMLCanvasElement, theme: string) => void;
-            };
-            parse: (
-              s: string,
-              ok: (tree: unknown) => void,
-              err?: (e: unknown) => void
-            ) => void;
-          };
-          Drawer?: new (opts: Record<string, unknown>) => unknown;
-          parse?: (s: string, ok: (t: unknown) => void, err?: (e: unknown) => void) => void;
-        };
-        const SD = mod.default ?? mod;
+        // smiles-drawer is a UMD module; resolve the namespace at runtime.
+        const mod = (await import("smiles-drawer")) as unknown as
+          | (SDApi & { default?: SDApi })
+          | { default: SDApi };
+        const sd: SDApi =
+          (mod as { default?: SDApi }).default ?? (mod as SDApi);
         if (cancelled || !canvasRef.current) return;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const drawer = new (SD as any).Drawer({ width, height, padding: 8, bondThickness: 1.2 });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (SD as any).parse(
+        const drawer = new sd.Drawer({
+          width,
+          height,
+          padding: 8,
+          bondThickness: 1.2,
+        });
+        sd.parse(
           smiles,
-          (tree: unknown) => {
+          (tree) => {
             if (!cancelled && canvasRef.current) {
               drawer.draw(tree, canvasRef.current, "light");
             }
