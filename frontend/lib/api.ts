@@ -1,5 +1,7 @@
 import type { UploadResult } from "./types";
 
+// Defaults to the gateway's localhost port so `npm run dev` works out of the box.
+// In docker-compose, NEXT_PUBLIC_API_URL is baked at build time via the Dockerfile ARG.
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
